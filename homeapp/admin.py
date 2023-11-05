@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import LibraryBooks, PaymentApplication, User, PaymentApproval, PaymentRecord
+from .models import LibraryBooks, PaymentApplication, User, PaymentApproval, PaymentRecord, Textbooks
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm
 
@@ -49,9 +49,16 @@ class LibraryBooksConfig(admin.ModelAdmin):
     search_fields = ('title', 'classname',)
     list_display = ('title', 'description', 'classname')
 
+#hazman
+class TextbookConfig(admin.ModelAdmin):
+    list_display=['title','classname','quantity']
+    search_fields = ['title']
+#######
+
 # Register the User model with the custom UserAdminConfig
 admin.site.register(User, UserAdminConfig)
 admin.site.register(PaymentApplication, PaymentApplicationConfig)
 admin.site.register(PaymentApproval, PaymentApprovalConfig)
 admin.site.register(PaymentRecord, PaymentRecordConfig)
 admin.site.register(LibraryBooks, LibraryBooksConfig)
+admin.site.register(Textbooks, TextbookConfig)
