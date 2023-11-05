@@ -82,3 +82,13 @@ class LibraryBooks(models.Model):
     title = models.CharField(max_length=250)
     description = models.TextField()
     classname = models.CharField(max_length=250)
+
+#hazman
+class Textbooks(models.Model):
+    title = models.CharField(max_length=250)
+    classname = models.OneToOneField('Class',on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    
+    def __str__(self):
+        return self.title
+########
