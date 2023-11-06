@@ -82,3 +82,22 @@ class LibraryBooks(models.Model):
     title = models.CharField(max_length=250)
     description = models.TextField()
     classname = models.CharField(max_length=250)
+
+#adrian
+class Class (models.Model):
+    name = models.CharField(max_length=250)
+
+    def __str__(self):
+        return self.name
+    
+class Students(models.Model):
+    name = models.CharField(max_length=250)
+    email = models.EmailField()
+    classname = models.ForeignKey(Class, on_delete=models.CASCADE)
+    section = models.CharField(max_length=20)
+    student_id = models.CharField(max_length=10, unique=True)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
+#######
