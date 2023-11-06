@@ -101,3 +101,14 @@ class Students(models.Model):
     def __str__(self):
         return self.name
 #######
+
+class Finance(models.Model):
+    name = models.CharField(max_length=250)
+    email = models.EmailField()
+    classname = models.ForeignKey(Class, on_delete=models.CASCADE)
+    section = models.CharField(max_length=20)
+    student_id = models.CharField(max_length=10, unique=True)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.name
