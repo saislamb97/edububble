@@ -49,9 +49,22 @@ class LibraryBooksConfig(admin.ModelAdmin):
     search_fields = ('title', 'classname',)
     list_display = ('title', 'description', 'classname')
 
+#adrian
+class StudentConfig(admin.ModelAdmin):
+    list_display = ['name', 'email', 'classname', 'section', 'student_id', 'status']
+    search_fields = ['name', 'email', 'student_id']
+    list_filter = ['classname', 'section', 'status']
+    
+class ClassConfig(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+#######
+
 # Register the User model with the custom UserAdminConfig
 admin.site.register(User, UserAdminConfig)
 admin.site.register(PaymentApplication, PaymentApplicationConfig)
 admin.site.register(PaymentApproval, PaymentApprovalConfig)
 admin.site.register(PaymentRecord, PaymentRecordConfig)
 admin.site.register(LibraryBooks, LibraryBooksConfig)
+admin.site.register(Students,StudentConfig)
+admin.site.register(Class,ClassConfig)
