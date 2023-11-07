@@ -1,4 +1,5 @@
 import os
+import pymysql
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -67,6 +68,10 @@ WSGI_APPLICATION = 'edububble.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+
+
+pymysql.version_info = (1, 4, 6, 'final', 0)  # (major, minor, micro, releaselevel, serial)
+pymysql.install_as_MySQLdb()
 
 DATABASES = {
     'default': {
