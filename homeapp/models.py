@@ -93,7 +93,7 @@ class Class (models.Model):
 class Students(models.Model):
     name = models.CharField(max_length=250)
     email = models.EmailField()
-    classname = models.ForeignKey(Class, on_delete=models.CASCADE)
+    classname = models.CharField(max_length=250)
     section = models.CharField(max_length=20)
     student_id = models.CharField(max_length=10, unique=True)
     status = models.BooleanField(default=False)
@@ -102,13 +102,29 @@ class Students(models.Model):
         return self.name
 #######
 
+class Textbooks(models.Model):
+    title = models.CharField(max_length=250)
+    classname = models.OneToOneField('Class', on_delete = models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    
+    def _str_(self):
+        return self.title
+
 class Finance(models.Model):
     name = models.CharField(max_length=250)
     email = models.EmailField()
-    classname = models.ForeignKey(Class, on_delete=models.CASCADE)
+    classname = models.CharField(max_length=250)
     section = models.CharField(max_length=20)
     student_id = models.CharField(max_length=10, unique=True)
     status = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+    
+class ClassName(models.Model):
+    classname = models.CharField(max_length=100, unique=True)
+    section = models.CharField(max_length=100,  unique=True)
+    textbooks = models.CharField(max_length=255, unique=True)
+    
+    def __str__(self):
+        return f"{self.classname} {self.section}"
