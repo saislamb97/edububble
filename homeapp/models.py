@@ -1,6 +1,11 @@
 from django.db import models
 from django.utils import timezone
+import os
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.core.mail import send_mail
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class CustomAccountManager(BaseUserManager):
@@ -33,11 +38,13 @@ class CustomAccountManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-
     email = models.EmailField(max_length=250, unique=True)
     username = models.CharField(max_length=250, unique=True)
     fullname = models.CharField(max_length=250, blank=True)
     start_date = models.DateTimeField(default=timezone.now)
+    is_student = models.BooleanField(default=False)
+    is_library = models.BooleanField(default=False)
+    is_finance = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
@@ -48,83 +55,89 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-    
-def payslip_file_extension(value):
-    import os
-    from django.core.exceptions import ValidationError
 
+class ClassName(models.Model):
+    classname = models.CharField(max_length=250, unique=True)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.classname
+    
+class Textbooks(models.Model):
+    book_title = models.CharField(max_length=250)
+    book_id = models.IntegerField(blank=True)
+    classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
+    
+    def __str__(self):
+        return self.book_title
+
+class Students(models.Model):
+    username = models.ForeignKey(User, on_delete=models.CASCADE)
+    student_id = models.IntegerField(blank=True)
+    classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
+    section = models.CharField(max_length=250, blank=True)
+    total_credit = models.IntegerField(blank=True)
+    total_due = models.IntegerField(blank=True)
+
+    def __str__(self):
+        return str(self.username)
+
+def payslip_file_extension(value):
     ext = os.path.splitext(value.name)[1]  # Get the file extension
-    valid_extensions = ['.jpg', '.jpeg', '.png', '.pdf']  # Add other valid extensions as needed
+    valid_extensions = ['.jpg', '.jpeg', '.png', '.pdf']
     if not ext.lower() in valid_extensions:
         raise ValidationError('Unsupported file extension. Supported extensions are .jpg, .jpeg, .png, .pdf')
 
 class PaymentApplication(models.Model):
-    title = models.CharField(max_length=250)
-    description = models.TextField()
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    application_date = models.DateTimeField(default=timezone.now)
+    paying_amount = models.IntegerField()
     payslip = models.FileField(upload_to='payslips/', validators=[payslip_file_extension])
+    is_pending = models.BooleanField(default=True)
     is_approved = models.BooleanField(default=False)
-
-class PaymentApproval(models.Model):
-    application = models.ForeignKey(PaymentApplication, on_delete=models.CASCADE)
-    approved_by = models.ForeignKey(User, on_delete=models.CASCADE)
-    approved_at = models.DateTimeField(auto_now_add=True)
-
-class PaymentRecord(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    paid_month = models.DateField()
-    is_paid = models.BooleanField(default=False)
-    
-    def __str__(self):
-        return f"{self.user.username}'s PaymentRecord for {self.paid_month}"
-    
-class LibraryBooks(models.Model):
-    title = models.CharField(max_length=250)
-    description = models.TextField()
-    classname = models.CharField(max_length=250)
-
-#adrian
-class Class (models.Model):
-    name = models.CharField(max_length=250)
+    is_rejected = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
-    
-class Students(models.Model):
-    name = models.CharField(max_length=250)
-    email = models.EmailField()
-    classname = models.CharField(max_length=250)
-    section = models.CharField(max_length=20)
-    student_id = models.CharField(max_length=10, unique=True)
-    status = models.BooleanField(default=False)
+        return str(self.student)
 
-    def __str__(self):
-        return self.name
-#######
+    def save(self, *args, **kwargs):
+        
+        # Ensure only one boolean field is true
+        if not (self.is_pending ^ self.is_approved ^ self.is_rejected):
+            raise ValidationError("Only one of is_pending, is_approved, is_rejected should be true.")
+        
+        # Check if the application is approved
+        if self.is_approved:
+            # Update the related Students model
+            self.student.total_due -= self.paying_amount
+            self.student.total_credit += self.paying_amount
+            self.student.save()
 
-class Textbooks(models.Model):
-    title = models.CharField(max_length=250)
-    classname = models.OneToOneField('Class', on_delete = models.CASCADE)
-    quantity = models.PositiveIntegerField()
-    
-    def _str_(self):
-        return self.title
+        super(PaymentApplication, self).save(*args, **kwargs)
 
-class Finance(models.Model):
-    name = models.CharField(max_length=250)
-    email = models.EmailField()
-    classname = models.CharField(max_length=250)
-    section = models.CharField(max_length=20)
-    student_id = models.CharField(max_length=10, unique=True)
-    status = models.BooleanField(default=False)
+@receiver(post_save, sender=PaymentApplication)
+def payment_application_changed(sender, instance, **kwargs):
+    # Check if the approval status changed
+    user_email = instance.student.username.email 
+    if getattr(instance, '_original_is_approved', False) != instance.is_approved:
+        send_approval_notification(user_email)
+    elif getattr(instance, '_original_is_rejected', False) != instance.is_rejected:
+        send_rejection_notification(user_email)
 
-    def __str__(self):
-        return self.name
-    
-class ClassName(models.Model):
-    classname = models.CharField(max_length=100, unique=True)
-    section = models.CharField(max_length=100,  unique=True)
-    textbooks = models.CharField(max_length=255, unique=True)
-    
-    def __str__(self):
-        return f"{self.classname} {self.section}"
+# Save the original values when the instance is loaded
+@receiver(post_save, sender=PaymentApplication)
+def save_original_values(sender, instance, **kwargs):
+    instance._original_is_approved = instance.is_approved
+    instance._original_is_rejected = instance.is_rejected
+
+def send_approval_notification(email):
+    # Implement your email sending logic here for approval notification
+    subject = 'Payment Application Approved'
+    message = 'Your payment application has been approved.'
+    send_mail(subject, message, 'sa.islamb97@gmail.com', [email])
+
+def send_rejection_notification(email):
+    # Implement your email sending logic here for rejection notification
+    subject = 'Payment Application Rejected'
+    message = 'Your payment application has been rejected.'
+    send_mail(subject, message, 'sa.islamb97@gmail.com', [email])
