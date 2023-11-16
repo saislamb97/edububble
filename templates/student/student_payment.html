@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %}home{% endblock %}
+{% block title %}student||payment{% endblock %}
 
 {% block content %}
 
   <header class="md:col-span-6 bg-stone-900 mb-2 py-2 text-white  rounded shadow-md">
-   <h1 class="text-2xl font-semibold text-white text-center py-5">Welcome to SMK ORKID DESA Admin Home Page</h1>
+    <h1 class="text-2xl font-semibold text-white text-center py-5">Welcome to SMK ORKID DESA student Payment Page</h1>
+    <a href="{% url 'homeapp:student_index' %}?botId={{ bot_id }}" class="block w-1/5 bg-gradient-to-l from-stone-500 to-stone-100 rounded shadow-md py-2">
+      <h1 class="text-base font-semibold text-center"> Go to student-dashboard </h1>
+    </a>
   </header>
 
   {% if messages %}
@@ -21,7 +24,7 @@
   <div class="container mx-auto bg-transparent py-10 px-10 text-gray-800 min-h-screen rounded shadow-md">
     <div class="w-2/3 mx-auto rounded shadow-lg p-5 h-full block">
       <h1 class="text-xl font-semibold text-center py-5 mb-10 bg-stone-50 rounded shadow-md">
-        This is update to github.
+        This is Payment Page.
       </h1>
     </div>
   </div>  
