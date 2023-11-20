@@ -23,9 +23,13 @@
 
   <div class="container mx-auto bg-transparent py-10 px-10 text-gray-800 min-h-screen rounded shadow-md">
     <div class="w-2/3 mx-auto rounded shadow-lg p-5 h-full block">
-      <h1 class="text-xl font-semibold text-center py-5 mb-10 bg-stone-50 rounded shadow-md">
-        This is Textbook Page.
-      </h1>
+      <h2>User Textbooks</h2>
+      <ul>
+          {% for entry in textbooks_with_classname %}
+              <li>{{ entry.textbook.book_title }} - {{ entry.class_name }}</li>
+              <!-- Display other textbook details or class information as needed -->
+          {% endfor %}
+      </ul>
     </div>
   </div>  
 

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, ClassName, Textbooks, Students, PaymentApplication
+from .models import User, ClassName, Textbooks, Students, PaymentApplication, StudentTextbook
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm
 
@@ -46,6 +46,12 @@ class StudentConfig(admin.ModelAdmin):
     search_fields = ['username__username', 'student_id', 'classname__classname', 'section']
     list_filter = ['username', 'student_id', 'classname', 'section']
 
+class StudentTextbookConfig(admin.ModelAdmin):
+    model = StudentTextbook
+    list_display = ['student', 'textbook', 'status']
+    search_fields = ['student__username', 'textbook__book_title']
+    list_filter = ['student', 'textbook', 'status']
+
 class PaymentApplicationConfig(admin.ModelAdmin):
     model = PaymentApplication
     list_display = ['student', 'application_date', 'paying_amount', 'is_pending', 'is_approved', 'is_rejected']
@@ -57,4 +63,5 @@ admin.site.register(User, UserAdminConfig)
 admin.site.register(ClassName,ClassNameConfig)
 admin.site.register(Textbooks, TextbooksConfig)
 admin.site.register(Students,StudentConfig)
+admin.site.register(StudentTextbook,StudentTextbookConfig)
 admin.site.register(PaymentApplication, PaymentApplicationConfig)

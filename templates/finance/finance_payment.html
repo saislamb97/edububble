@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}finance||payment{% endblock %}
+
+{% block content %}
+
+  <header class="md:col-span-6 bg-stone-900 mb-2 py-2 text-white  rounded shadow-md">
+    <h1 class="text-2xl font-semibold text-white text-center py-5">Welcome to SMK ORKID DESA Finanace Payment Page</h1>
+    <a href="{% url 'homeapp:finance_index' %}?botId={{ bot_id }}" class="block w-1/5 bg-gradient-to-l from-stone-500 to-stone-100 rounded shadow-md py-2">
+      <h1 class="text-base font-semibold text-center"> Go to finance-dashboard </h1>
+    </a>
+  </header>
+
+  {% if messages %}
+  <div class="bg-green-200 p-2 text-center text-stone-800">
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+  {% endif %}
+
+  <div class="container mx-auto bg-transparent py-10 px-10 text-gray-800 min-h-screen rounded shadow-md">
+    <div class="w-2/3 mx-auto rounded shadow-lg p-5 h-full block">
+      <!-- Display classes, students, and their payments -->
+      {% for class_data in class_students_payments %}
+      <h2>{{ class_data.class_obj.classname }}</h2>
+      <ul>
+          {% for student_data in class_data.class_students %}
+              <li>
+                  <strong>Student: </strong>{{ student_data.student.username }}
+                  <ul>
+                      {% for payment in student_data.payments %}
+                          <li>
+                              <p>Payment ID: {{ payment.id }}</p>
+                              <p>Amount: {{ payment.paying_amount }}</p>
+                              <p>Date: {{ payment.application_date }}</p>
+                              <p>Payslip:
+                                <a href="{{ payment.payslip.url }}" target="_blank" class="text-sky-700 hover:text-sky-900 underline">View Payslip</a>
+                              </p>
+                              <p>Status: 
+                                {% if payment.is_pending %}
+                                    Pending
+                                    <form action="{% url 'homeapp:finance_payment' %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="payment_id" value="{{ payment.id }}">
+                                        <button type="submit" name="is_approved" value="1" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+                                        onclick="return confirm('Confirm the approval')">Approve</button>
+                                        <button type="submit" name="is_rejected" value="1" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                                        onclick="return confirm('Confirm the rejection')">Reject</button>
+                                    </form>
+                                {% elif payment.is_approved %}
+                                    Approved
+                                {% elif payment.is_rejected %}
+                                    Rejected
+                                {% else %}
+                                    Status not available
+                                {% endif %}
+                            </p>
+                          </li>
+                          <br>
+                      {% endfor %}
+                  </ul>
+              </li>
+          {% endfor %}
+      </ul>
+      {% endfor %}
+    </div>
+  </div>  
+
+{% endblock %}
