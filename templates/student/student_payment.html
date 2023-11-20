@@ -23,9 +23,30 @@
 
   <div class="container mx-auto bg-transparent py-10 px-10 text-gray-800 min-h-screen rounded shadow-md">
     <div class="w-2/3 mx-auto rounded shadow-lg p-5 h-full block">
-      <h1 class="text-xl font-semibold text-center py-5 mb-10 bg-stone-50 rounded shadow-md">
-        This is Payment Page.
-      </h1>
+      <h2>User Payments</h2>
+      <br>
+      <ul>
+          {% for payment in user_payments %}
+              <li>
+                <p>Payment ID: {{ payment.id }}</p>
+                <p>Amount: {{ payment.paying_amount }}</p>
+                <p>Date: {{ payment.application_date }}</p>
+                <p>Status: 
+                  {% if payment.is_pending %}
+                      Pending
+                  {% elif payment.is_approved %}
+                      Approved
+                  {% elif payment.is_rejected %}
+                      Rejected
+                  {% else %}
+                      Status not available
+                  {% endif %}
+                </p>
+              </li>
+              <br>
+              <!-- Display other payment details as needed -->
+          {% endfor %}
+      </ul>
     </div>
   </div>  
 

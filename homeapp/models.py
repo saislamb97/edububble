@@ -4,7 +4,7 @@ import os
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.core.mail import send_mail
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 
 
@@ -78,9 +78,31 @@ class Students(models.Model):
     section = models.CharField(max_length=250, blank=True)
     total_credit = models.IntegerField(blank=True)
     total_due = models.IntegerField(blank=True)
+    textbooks = models.ManyToManyField(Textbooks, blank=True)
 
     def __str__(self):
         return str(self.username)
+    
+class StudentTextbook(models.Model):
+    student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    textbook = models.ForeignKey(Textbooks, on_delete=models.CASCADE)
+    STATUS_CHOICES = [
+        ('collected', 'Collected'),
+        ('not_collected', 'Not Collected'),
+        ('returned', 'Returned'),
+    ]
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.textbook.book_title} - {self.status}"
+    
+@receiver(m2m_changed, sender=Students.textbooks.through)
+def create_student_textbook(sender, instance, action, **kwargs):
+    if action == 'post_add':
+        textbooks = kwargs['pk_set']
+        for textbook_id in textbooks:
+            textbook = Textbooks.objects.get(id=textbook_id)
+            StudentTextbook.objects.create(student=instance, textbook=textbook, status='not_collected')
 
 def payslip_file_extension(value):
     ext = os.path.splitext(value.name)[1]  # Get the file extension

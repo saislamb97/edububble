@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from .models import User
+from .models import User, ClassName, Textbooks, Students, PaymentApplication
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
@@ -37,3 +37,16 @@ class UserForm(forms.ModelForm):
             'fullname': 'Full Name',
         }
 
+class PaymentApplicationForm(forms.ModelForm):
+    class Meta:
+        model = PaymentApplication
+        fields = ['paying_amount', 'payslip']
+
+        widgets = {
+            'paying_amount': forms.NumberInput(attrs={'class': 'border p-2 m-4 rounded w-full'}),
+            'payslip': forms.FileInput(attrs={'class': 'p-2 m-4 w-full', 'accept': 'image/png, image/jpeg, .pdf'}),
+        }
+        labels = {
+            'paying_amount': 'Payment Amount',
+            'payslip': 'Payment Receipt',
+        }
