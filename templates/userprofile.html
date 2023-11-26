@@ -18,18 +18,26 @@
     </div>
 {% endif %}
 
-<div class="container mx-auto bg-transparent py-10 px-6 text-gray-800">
-    <div class="w-full md:w-2/3 mx-auto bg-white rounded shadow-md p-8">
-        <h1 class="text-2xl font-semibold text-center mb-8">Personal Information</h1>
-        <div class="text-center mb-10">
-            <i class="fas fa-user text-red-500 text-8xl"></i> <!-- Assuming you're using Font Awesome for the icon -->
-        </div>
-        <form method="post">
-            {% csrf_token %}
-            {{ userform.as_p }}
-            <button type="submit" name="userform-submit" class="w-full bg-stone-500 hover:bg-stone-700 text-white font-bold py-4 rounded transition duration-300 ease-in-out transform">Update</button>
-        </form>
+<div class="container mx-auto bg-gray-300 py-10 px-10 text-gray-800 min-h-screen rounded-2xl shadow-md"
+style="background-image: url('C:\Users\hazma\Desktop\Project\AD Project\edububble-school-management\media\profiles\background.png'); background-size: cover; background-repeat: no-repeat; background-position: center;">
+    
+    
+    <h1 class="text-3xl text-black font-bold text-center py-2 mb-1 bg-transparent rounded-xl">
+      <i class="fa-solid fa-address-card text-indigo-900 text-8xl"></i><br><br>
+        Personal Information 
+      <hr class="w-96 h-2 bg-gray-500 mx-auto bg-balc border-spacing-1 rounded-md md:my-4 shadow-lg">
+    </h1>
+    <div class=" w-2/4 mx-auto bg-gray-400 text-black font-semibold rounded-xl shadow-lg p-6 h-full block">
+      <form method="post">
+        {% csrf_token %}
+        {{ userform.as_p }}
+
+        
+
+        {% comment %} <div class = 'container mx-auto bg-transparent py-10 px-10 text-teal-700 min-h-screen rounded-md shadow-md'> {% endcomment %}
+        <button type="submit" name="userform-submit" class="block mx-auto w-1/3 ml-auto bg-indigo-900 hover:bg-sky-600 text-white font-bold py-4 px-4 mt-4 rounded-full transition duration-300 ease-in-out transform">Update</button>
+      </form>
     </div>
-</div>
+  </div>
 
 {% endblock %}
