@@ -57,7 +57,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
 class ClassName(models.Model):
-    classname = models.CharField(max_length=250, unique=True)
+    CLASS_CHOICES = [
+        ('grade1', 'Grade 1'),
+        ('grade2', 'Grade 2'),
+        ('grade3', 'Grade 3'),
+        ('grade4', 'Grade 4'),
+        ('grade5', 'Grade 5'),
+    ]
+    classname = models.CharField(max_length=250, choices=CLASS_CHOICES)
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -65,7 +72,7 @@ class ClassName(models.Model):
     
 class Textbooks(models.Model):
     book_title = models.CharField(max_length=250)
-    book_id = models.IntegerField(blank=True)
+    book_id = models.CharField(max_length=250, blank=True)
     classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
     
     def __str__(self):
