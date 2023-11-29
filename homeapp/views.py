@@ -23,12 +23,42 @@ def IndexView(request):
 @login_required(login_url='homeapp:login')
 @student_required
 def StudentIndexView(request):
-    user = request.user
+    logged_in_user = request.user
 
-    context = {
-        'user': user,
-    }
-    return render(request, 'student/student_index.html', context)
+    if logged_in_user.is_authenticated and logged_in_user.is_student:
+        student_profile = Students.objects.get(username=logged_in_user)
+
+        # Fetch textbooks and their status for the current student
+        textbooks = Textbooks.objects.filter(studenttextbook__student=student_profile)
+        textbooks_with_status = []
+
+        for textbook in textbooks:
+            student_textbook = StudentTextbook.objects.filter(student=student_profile, textbook=textbook).first()
+            status = student_textbook.status if student_textbook else 'Not Specified'
+            textbooks_with_status.append({
+                'textbook': textbook,
+                'status': status
+            })
+
+        # Fetch payment information for the current student
+        user_payments = PaymentApplication.objects.filter(student=student_profile)
+
+        # Calculate the textbook summary
+        total_textbooks = len(textbooks)
+
+        textbook_summary = {
+            'total_textbooks': total_textbooks,
+        }
+
+        context = {
+            'user': logged_in_user,
+            'classname': student_profile.classname,
+            'section': student_profile.section,
+            'summary': textbook_summary,
+            'payment': user_payments.first(),
+        }
+
+        return render(request, 'student/student_index.html', context)
 
 @login_required(login_url='homeapp:login')
 @student_required
