@@ -4,7 +4,7 @@
 
 <header class="bg-stone-900 mb-8 py-6 text-white rounded shadow-md text-center">
     <div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white py-10">
-      <h1 class="text-4xl font-semibold text-center">Welcome to SMK ORKID DESA Student Home Page</h1>
+        <h1 class="text-4xl font-semibold text-white text-center py-5">Welcome, {{ user }} !</h1>
     </div>
 </header>
 
@@ -22,17 +22,42 @@
     <div class="bg-white rounded shadow-md p-8 mb-8">
         <h2 class="text-2xl font-semibold text-center mb-5">Analytics Section</h2>
         <!-- Add your analytics content here -->
+        <div class="flex space-x-4">
+            <div class="bg-stone-50 px-5 text-xl rounded-xl border-2 border-solid border-black w-[350px] h-[150px]">Class <i class="fa-solid fa-graduation-cap"></i><div class="py-10 text-center">{{ classname }} - {{ section }}</div></div>
+            
+            <div class="bg-stone-50 px-5 text-xl rounded-xl border-2 border-solid border-black w-[350px] h-[150px]">
+                Total Textbooks <i class="fa-solid fa-book"></i></a>
+                <div class="py-10 text-center">
+                    <a href="{% url 'homeapp:student_textbook' %}"><p class="text-blue-500 underline hover:text-red-500 hover:underline">{{ summary.total_textbooks }} Textbooks</p></a>
+                </div>
+            </div>
+            
+    
+            <div class="bg-stone-50 px-5 text-xl rounded-xl border-2 border-solid border-black w-[350px] h-[150px]">Payment Status <i class="fa-solid fa-calculator"></i><div class="py-10 text-center"> 
+                {% if payment and payment.is_pending %}
+                    Pending
+                {% elif payment.is_approved %}
+                    Approved
+                {% elif payment.is_rejected %}
+                    Rejected
+                {% else %}
+                    Status not available
+                {% endif %}
+            </div></div>
+      </div>
+    </div>
+    
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <a href="{% url 'homeapp:student_textbook' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-md text-center transition duration-300 ease-in-out transform hover:scale-105">
-            Explore Student Textbooks
+        Textbooks  <i class="fa-solid fa-book text-white"></i>
         </a>
         <a href="{% url 'homeapp:student_payment' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-md text-center transition duration-300 ease-in-out transform hover:scale-105">
-            Access Student Payments
+        Payment <i class="fa-solid fa-money-bills text-white"></i>
         </a>
         <a href="{% url 'homeapp:student_payment_application' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-6 rounded-md text-center transition duration-300 ease-in-out transform hover:scale-105">
-            Apply for Payment Verification
+            Apply for Payment Verification <i class="fa-regular fa-square-plus text-white"></i>
         </a>
     </div>
 </div>
