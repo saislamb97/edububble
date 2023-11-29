@@ -66,7 +66,7 @@ def StudentPaymentView(request):
         context = {
             'user_payments': user_payments
         }
-        
+
     return render(request, 'student/student_payment.html', context)
 
 @login_required(login_url='homeapp:login')

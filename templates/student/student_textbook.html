@@ -2,11 +2,13 @@
 {% block title %}student||textbook{% endblock %}
 {% block content %}
 
-  <header class="bg-gradient-to-r from-purple-700 to-indigo-700 text-white py-10">
-    <h1 class="text-3xl font-semibold text-center">Welcome to SMK ORKID DESA Student Textbook Page</h1>
-    <a href="{% url 'homeapp:student_index' %}?botId={{ bot_id }}" class="block w-1/4 mx-auto mt-5 bg-indigo-500 hover:bg-indigo-600 text-center text-white font-semibold rounded-md py-3">
-      Go to Student Dashboard
-    </a>
+  <header class="bg-stone-900 mb-8 py-6 text-white rounded shadow-md text-center">
+    <div class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white py-10">
+      <h1 class="text-4xl font-semibold">SMK ORKID DESA Student Textbooks</h1>
+      <a href="{% url 'homeapp:student_index' %}?botId={{ bot_id }}" class="block w-1/4 mx-auto mt-5 bg-indigo-500 hover:bg-indigo-600 text-center text-white font-semibold rounded-md py-3">
+        Go to Student Dashboard
+      </a>
+    </div>
   </header>
 
   {% if messages %}
@@ -19,15 +21,20 @@
     </div>
   {% endif %}
 
-  <div class="container mx-auto py-10 px-6 text-gray-800">
-    <div class="w-2/3 mx-auto rounded-lg bg-white shadow-md p-6">
-      <h2 class="text-2xl font-semibold mb-4">User Textbooks</h2>
-      <ul>
+  <div class="container mx-auto bg-gray-300 py-10 px-10 text-gray-800 min-h-500 rounded-2xl shadow-md text-center">
+    <h1 class="text-3xl text-black font-bold py-2 mb-1 bg-transparent rounded-xl">
+      <i class="fa-solid fa-book text-indigo-900 text-8xl"></i><br><br>
+      Student Textbooks
+      <hr class="w-96 h-2 bg-gray-500 mx-auto bg-balc border-spacing-1 rounded-md md:my-4 shadow-lg">
+    </h1>
+    
+    <div class="w-2/4 mx-auto bg-gray-400 text-black font-semibold rounded-xl shadow-lg p-6 h-full block text-left">
+      <form method="post">
         {% for entry in textbooks_with_classname %}
-          <li class="py-2 border-b border-gray-200">{{ entry.textbook.book_title }} - {{ entry.class_name }}</li>
+          <li class="py-2 border-b border-gray-200 text-2">{{ entry.textbook.book_title }} - {{ entry.class_name }}</li>
           <!-- Display other textbook details or class information as needed -->
         {% endfor %}
-      </ul>
+      </form>
     </div>
   </div>  
 

@@ -58,11 +58,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class ClassName(models.Model):
     CLASS_CHOICES = [
-        ('grade1', 'Grade 1'),
-        ('grade2', 'Grade 2'),
-        ('grade3', 'Grade 3'),
-        ('grade4', 'Grade 4'),
-        ('grade5', 'Grade 5'),
+        ('form1', 'Form 1'),
+        ('form2', 'Form 2'),
+        ('form3', 'Form 3'),
+        ('form4', 'Form 4'),
+        ('form5', 'Form 5'),
     ]
     classname = models.CharField(max_length=250, choices=CLASS_CHOICES)
     description = models.TextField(blank=True)
