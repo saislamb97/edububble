@@ -6,7 +6,12 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseU
 from django.core.mail import send_mail
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
+import random
 
+def generate_unique_id():
+    # Generate a random 6-digit unique ID
+    unique_id = random.randint(100000, 999999)
+    return unique_id
 
 class CustomAccountManager(BaseUserManager):
 
@@ -55,6 +60,17 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+    
+    def clean(self):
+        # Check if the user has multiple roles selected
+        roles_count = sum([self.is_student, self.is_library, self.is_finance])
+
+        if roles_count > 1:
+            raise ValidationError("A user cannot have multiple roles simultaneously.")
+
+    def save(self, *args, **kwargs):
+        self.clean()  # Perform validation before saving
+        super().save(*args, **kwargs)
 
 class ClassName(models.Model):
     CLASS_CHOICES = [
@@ -72,7 +88,7 @@ class ClassName(models.Model):
     
 class Textbooks(models.Model):
     book_title = models.CharField(max_length=250)
-    book_id = models.CharField(max_length=250, blank=True)
+    book_id = models.CharField(max_length=250, default=generate_unique_id, unique=True)
     classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
     
     def __str__(self):
@@ -80,15 +96,45 @@ class Textbooks(models.Model):
 
 class Students(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
-    student_id = models.IntegerField(blank=True)
+    student_id = models.CharField(max_length=250, default=generate_unique_id, unique=True)
     classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
-    section = models.CharField(max_length=250, blank=True)
-    total_credit = models.IntegerField(blank=True)
-    total_due = models.IntegerField(blank=True)
+    SECTION_CHOICES = [
+        ('sec_a', 'Section A'),
+        ('sec_b', 'Section B'),
+        ('sec_c', 'Section C'),
+        ('sec_d', 'Section D'),
+        ('sec_e', 'Section E'),
+    ]
+    section = models.CharField(max_length=250, blank=True, null=True, choices=SECTION_CHOICES)
+    total_credit = models.IntegerField(blank=True, null=True)
+    total_due = models.IntegerField(blank=True, null=True)
     textbooks = models.ManyToManyField(Textbooks, blank=True)
 
     def __str__(self):
         return str(self.username)
+    
+@receiver(post_save, sender=User)
+def create_or_update_student_profile(sender, instance, created, **kwargs):
+    if instance.is_student:
+        # Check if the user is marked as a student
+        if created:
+            # If the User instance is newly created and marked as a student
+            Students.objects.create(username=instance)
+        else:
+            # If the User instance is updated and marked as a student,
+            # get the associated Students instance and update it
+            student_profile, _ = Students.objects.get_or_create(username=instance)
+            # Update other fields if needed
+            student_profile.save()
+    else:
+        # If the user is not marked as a student, delete the associated Students instance
+        Students.objects.filter(username=instance).delete()
+
+@receiver(post_save, sender=User)
+def delete_student_profile(sender, instance, **kwargs):
+    if not instance.is_student:
+        # If the user is not marked as a student, delete the associated Students instance
+        Students.objects.filter(username=instance).delete()
     
 class StudentTextbook(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE)
@@ -119,6 +165,7 @@ def payslip_file_extension(value):
 
 class PaymentApplication(models.Model):
     student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    application_id = models.CharField(max_length=250, default=generate_unique_id, unique=True)
     application_date = models.DateTimeField(default=timezone.now)
     paying_amount = models.IntegerField()
     payslip = models.FileField(upload_to='payslips/', validators=[payslip_file_extension])
@@ -128,12 +175,15 @@ class PaymentApplication(models.Model):
 
     def __str__(self):
         return str(self.student)
+    
+    def clean(self):
+        # Check if the application has multiple statuses selected
+        statuses_count = sum([self.is_pending, self.is_approved, self.is_rejected])
+
+        if statuses_count > 1:
+            raise ValidationError("A payment application cannot have multiple statuses simultaneously.")
 
     def save(self, *args, **kwargs):
-        
-        # Ensure only one boolean field is true
-        if not (self.is_pending ^ self.is_approved ^ self.is_rejected):
-            raise ValidationError("Only one of is_pending, is_approved, is_rejected should be true.")
         
         # Check if the application is approved
         if self.is_approved:

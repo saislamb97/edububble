@@ -12,6 +12,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="flex bg-gradient-to-t from-stone-500 to-stone-100  no-scrollbar overflow-y-auto h-full">
+
     <!-- Mobile Menu Toggle -->
     <div class="md:hidden fixed h-full z-50">
         <button id="menu-toggle" class="p-2">
@@ -19,97 +20,70 @@
             <i id="menu-icon-cross" class="fas fa-window-close text-3xl hidden"></i>
         </button>
     </div>
+
     <!-- Left Panel (Mobile) -->
-    <aside id="mobile-menu" class="hidden md:hidden w-2/5 bg-stone-900 p-10 fixed h-full z-30">
-        <nav>
-            <ul class="space-y-4">
-                {% if request.user.is_authenticated %}
-                    {% if request.user.is_superuser %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:index' %}">Admin Dashboard</a>
-                        </li>
-                    {% elif request.user.is_student %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:student_index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:student_index' %}">Student Dashboard</a>
-                        </li>
-                    {% elif request.user.is_library %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:library_index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:library_index' %}">Library Dashboard</a>
-                        </li>
-                    {% elif request.user.is_finance %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:finance_index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:finance_index' %}">Finance Dashboard</a>
-                        </li>
-                    {% endif %}
-                    <li><a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:userprofile' %}">Profile</a></li>
-                    <li><a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:logout' %}">Logout</a></li>
-                    <!-- Other navigation links for the left panel -->
+    <aside id="mobile-menu" class="hidden md:hidden w-2/5 bg-gray-900 p-10 fixed h-full z-30">
+        <nav class="space-y-5">
+            {% if request.user.is_authenticated %}
+                <div class="border-b border-white mb-10 py-6 flex items-center justify-center">
+                    <a href="{% url 'homeapp:index' %}" class="flex items-center">
+                        <img src="{% static 'images/school_logo.png' %}" alt="logo" class="w-24 h-24 mr-2">
+                        <span class="text-2xl text-white font-bold">SMK ORKID DESA</span>
+                    </a>
+                </div> 
+
+                {% if request.user.is_superuser %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:index' %}">Admin Dashboard</a>
+                {% elif request.user.is_student %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:student_index' %}">Student Dashboard</a>
+                {% elif request.user.is_library %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:library_index' %}">Library Dashboard</a>
+                {% elif request.user.is_finance %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:finance_index' %}">Finance Dashboard</a>
                 {% endif %}
-            </ul>
+
+                <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:userprofile' %}">Profile</a>
+                <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:logout' %}">Logout</a>
+            {% endif %}
+
         </nav>
     </aside>
 
     <!-- Left Panel (Desktop) -->
-    <aside class="hidden md:block w-1/5 bg-stone-900 p-10 fixed h-full z-30">
-        <nav>
-            <ul class="space-y-4">
-                {% if request.user.is_authenticated %}
-                    {% if request.user.is_superuser %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:index' %}">Admin Dashboard</a>
-                        </li>
-                    {% elif request.user.is_student %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:student_index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:student_index' %}">Student Dashboard</a>
-                        </li>
-                    {% elif request.user.is_library %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:library_index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:library_index' %}">Library Dashboard</a>
-                        </li>
-                    {% elif request.user.is_finance %}
-                        <li class="border-b border-white mb-10">
-                            <a href="{% url 'homeapp:finance_index' %}"><img src="{% static 'images/school_logo.png' %}" alt="logo"></a>
-                        </li>
-                        <li>
-                            <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:finance_index' %}">Finance Dashboard</a>
-                        </li>
-                    {% endif %}
-                    <li><a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:userprofile' %}">Profile</a></li>
-                    <li><a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:logout' %}">Logout</a></li>
-                    <!-- Other navigation links for the left panel -->
+    <aside class="hidden md:block w-1/5 bg-gray-900 p-10 fixed h-full z-30">
+        <nav class="space-y-5">
+            {% if request.user.is_authenticated %}
+                <div class="border-b border-white mb-10 py-6 flex items-center justify-center">
+                    <a href="{% url 'homeapp:index' %}" class="flex items-center">
+                        <img src="{% static 'images/school_logo.png' %}" alt="logo" class="w-24 h-24 mr-2">
+                        <span class="text-2xl text-white font-bold">SMK ORKID DESA</span>
+                    </a>
+                </div>            
+
+                {% if request.user.is_superuser %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:index' %}">Admin Dashboard</a>
+                {% elif request.user.is_student %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:student_index' %}">Student Dashboard</a>
+                {% elif request.user.is_library %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:library_index' %}">Library Dashboard</a>
+                {% elif request.user.is_finance %}
+                    <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:finance_index' %}">Finance Dashboard</a>
                 {% endif %}
-            </ul>
+
+                <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:userprofile' %}">Profile</a>
+                <a class="block text-xl text-stone-100 hover:text-white hover:border-b hover:border-white transition duration-300 ease-in-out transform hover:scale-105" href="{% url 'homeapp:logout' %}">Logout</a>
+            {% endif %}
+
         </nav>
     </aside>
 
     <!-- Main Content -->
     <main class="w-4/5 p-5 ml-auto">
-        <div class="container mx-auto">
+        <div class="container mx-auto min-h-screen">
             {% block content %}{% endblock %}
         </div>
 
-        <footer class="bg-stone-900 py-10 mt-10 rounded shadow-md">
+        <footer class="bg-gray-900 py-10 mt-10 rounded shadow-md">
             <p class="font-semibold text-white text-center">&copy; 2023 | FTRdevs | All rights reserved.</p>
         </footer>
     </main>

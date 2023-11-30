@@ -1,3 +1,4 @@
+from django import forms
 from django.contrib import admin
 from .models import User, ClassName, Textbooks, Students, PaymentApplication, StudentTextbook
 from django.contrib.auth.admin import UserAdmin
@@ -40,11 +41,22 @@ class TextbooksConfig(admin.ModelAdmin):
     list_display = ['book_title', 'book_id', 'classname']
     list_filter = ['book_title', 'book_id', 'classname']
 
+class StudentAdminForm(forms.ModelForm):
+    class Meta:
+        model = Students
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(StudentAdminForm, self).__init__(*args, **kwargs)
+        # Filter available textbooks based on the selected class
+        self.fields['textbooks'].queryset = self.fields['textbooks'].queryset.filter(classname=self.instance.classname)
+
 class StudentConfig(admin.ModelAdmin):
     model = Students
     list_display = ['username', 'student_id', 'classname', 'section', 'total_credit', 'total_due']
     search_fields = ['username__username', 'student_id', 'classname__classname', 'section']
     list_filter = ['username', 'student_id', 'classname', 'section']
+    form = StudentAdminForm
 
 class StudentTextbookConfig(admin.ModelAdmin):
     model = StudentTextbook
@@ -58,6 +70,10 @@ class PaymentApplicationConfig(admin.ModelAdmin):
     search_fields = ['student__username', 'application_date', 'paying_amount', 'is_pending', 'is_approved', 'is_rejected']
     list_filter = ['student', 'application_date', 'paying_amount', 'is_pending', 'is_approved', 'is_rejected']
 
+# Change the title of the Django admin site
+admin.site.site_header = 'SMK ORKID DESA Admin Panel'
+admin.site.site_title = 'SMK ORKID DESA || Admin'
+admin.site.index_title = 'Admin Dashboard'
 
 admin.site.register(User, UserAdminConfig)
 admin.site.register(ClassName,ClassNameConfig)

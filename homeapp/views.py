@@ -1,11 +1,9 @@
-from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, render, redirect
-from django.contrib.auth import authenticate,login,logout
+from django.contrib.auth import login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, PaymentApplicationForm, UserForm
-from .decorators import redirect_authenticated_user, admin_required, student_required, library_required, finance_required
+from .decorators import admin_required, student_required, library_required, finance_required
 from django.contrib import messages
-import secrets
 from .models import ClassName, StudentTextbook, Students, Textbooks, PaymentApplication
 
 
@@ -23,74 +21,49 @@ def IndexView(request):
 @login_required(login_url='homeapp:login')
 @student_required
 def StudentIndexView(request):
-    logged_in_user = request.user
+    user = request.user
 
-    if logged_in_user.is_authenticated and logged_in_user.is_student:
-        student_profile = Students.objects.get(username=logged_in_user)
+    context = {
+        'user': user,
+    }
 
-        # Fetch textbooks and their status for the current student
-        textbooks = Textbooks.objects.filter(studenttextbook__student=student_profile)
-        textbooks_with_status = []
-
-        for textbook in textbooks:
-            student_textbook = StudentTextbook.objects.filter(student=student_profile, textbook=textbook).first()
-            status = student_textbook.status if student_textbook else 'Not Specified'
-            textbooks_with_status.append({
-                'textbook': textbook,
-                'status': status
-            })
-
-        # Fetch payment information for the current student
-        user_payments = PaymentApplication.objects.filter(student=student_profile)
-
-        # Calculate the textbook summary
-        total_textbooks = len(textbooks)
-
-        textbook_summary = {
-            'total_textbooks': total_textbooks,
-        }
-
-        context = {
-            'user': logged_in_user,
-            'classname': student_profile.classname,
-            'section': student_profile.section,
-            'summary': textbook_summary,
-            'payment': user_payments.first(),
-        }
-
-        return render(request, 'student/student_index.html', context)
+    return render(request, 'student/student_index.html', context)
 
 @login_required(login_url='homeapp:login')
 @student_required
 def StudentTextbookView(request):
-    logged_in_user = request.user
+    user = request.user
 
-    if logged_in_user.is_authenticated and logged_in_user.is_student:
-        student_profile = Students.objects.get(username=logged_in_user)
+    if user.is_authenticated and user.is_student:
+        student_profile = Students.objects.get(username=user)
         user_textbooks = student_profile.textbooks.all()
         
-        # Fetch class names for the textbooks
-        textbooks_with_classname = []
+        # Fetch class names for the textbooks along with their status
+        textbooks_with_status = []
         for textbook in user_textbooks:
             class_name = ClassName.objects.get(pk=textbook.classname_id)
-            textbooks_with_classname.append({
-                'textbook': textbook,
-                'class_name': class_name.classname
-            })
+            # Retrieve the corresponding StudentTextbook instance
+            student_textbook = StudentTextbook.objects.filter(student=student_profile, textbook=textbook).first()
+            if student_textbook:
+                textbooks_with_status.append({
+                    'textbook': textbook,
+                    'class_name': class_name.classname,
+                    'status': student_textbook.status  # Add status information
+                })
         
         context = {
-            'textbooks_with_classname': textbooks_with_classname
+            'textbooks_with_status': textbooks_with_status  # Pass textbooks with status to the template
         }
 
-    return render(request, 'student/student_textbook.html', context)
+        return render(request, 'student/student_textbook.html', context)
 
 @login_required(login_url='homeapp:login')
 @student_required
 def StudentPaymentView(request):
-    logged_in_user = request.user
+    user = request.user
 
-    if logged_in_user.is_authenticated and logged_in_user.is_student:
-        student_profile = Students.objects.get(username=logged_in_user)
+    if user.is_authenticated and user.is_student:
+        student_profile = Students.objects.get(username=user)
         user_payments = PaymentApplication.objects.filter(student=student_profile)
         
         context = {
@@ -102,10 +75,10 @@ def StudentPaymentView(request):
 @login_required(login_url='homeapp:login')
 @student_required
 def StudentPaymentApplicationView(request):
-    logged_in_user = request.user
+    user = request.user
 
-    if logged_in_user.is_authenticated and logged_in_user.is_student:
-        student_profile = Students.objects.get(username=logged_in_user)
+    if user.is_authenticated and user.is_student:
+        student_profile = Students.objects.get(username=user)
         
         if request.method == 'POST':
             paymentform = PaymentApplicationForm(request.POST, request.FILES)
