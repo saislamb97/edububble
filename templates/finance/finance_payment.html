@@ -2,25 +2,18 @@
 {% block title %}finance||payment{% endblock %}
 {% block content %}
 
-<header class="bg-gradient-to-r from-blue-900 to-indigo-900 text-white py-10">
-    <h1 class="text-4xl font-semibold text-center">Welcome to SMK ORKID DESA Finance Payment Page</h1>
-    <a href="{% url 'homeapp:finance_index' %}?botId={{ bot_id }}" class="block mx-auto mt-5 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-md py-3 w-2/5 text-center">
-        Go to Finance Dashboard
-    </a>
-</header>
-
 {% if messages %}
-    <div class="bg-green-200 p-4 text-center text-green-800 my-6">
-        <ul>
-            {% for message in messages %}
+        <div class="bg-green-200 p-2 text-center text-stone-800">
+            <ul>
+                {% for message in messages %}
                 <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    </div>
+                {% endfor %}
+            </ul>
+        </div>
 {% endif %}
 
-<div class="container mx-auto py-10 px-6 text-gray-800">
-    <div class="grid grid-cols-1 gap-6">
+<div class="container mx-auto bg-gray-300 py-10 px-10 text-gray-800 min-h-screen flex flex-col justify-center items-center rounded-2xl shadow-md">
+    <div class="grid grid-cols-2 gap-6">
         {% for class_data in class_students_payments %}
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                 <h2 class="text-xl font-semibold">{{ class_data.class_obj.classname }}</h2>

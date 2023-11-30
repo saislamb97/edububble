@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from .models import User, ClassName, Textbooks, Students, PaymentApplication
+from .models import User, PaymentApplication
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
@@ -26,6 +26,7 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['email', 'username', 'fullname']
+
         widgets = {
             'email': forms.EmailInput(attrs={'class': 'border p-2 mt-4 mb-4 rounded w-full'}),
             'username': forms.TextInput(attrs={'class': 'border p-2 mt-4 mb-4 rounded w-full'}),
