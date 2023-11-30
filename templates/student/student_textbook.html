@@ -23,9 +23,9 @@
         {% for textbook in textbooks_with_status %}
         <li class="py-4">
             <div class="mb-2">
-                <p class="text-lg font-semibold">Title: {{ textbook.textbook }}</p>
+                <p class="text-lg font-semibold">Book Id: {{ textbook.textbook.book_id }}</p>
+                <p class="text-lg font-semibold">Title: {{ textbook.textbook.book_title }}</p>
                 <p class="text-lg font-semibold">Class: {{ textbook.class_name }}</p>
-                <p class="text-lg font-semibold">Book Id: {{ textbook.book_id }}</p>
                 <p class="text-lg font-semibold">Status:
                     <span class="{% if textbook.status == 'collected' %}text-green-600{% elif textbook.status == 'not_collected' %}text-red-600{% elif textbook.status == 'returned' %}text-blue-600{% else %}text-gray-600{% endif %}">
                         {{ textbook.status }}

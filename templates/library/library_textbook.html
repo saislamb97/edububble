@@ -23,7 +23,8 @@
                         <div class="grid grid-cols-1 gap-4">
                             {% for textbook in student_data.textbooks %}
                                 <div class="bg-gray-100 rounded-md p-4">
-                                    <p><strong>Book Title:</strong> {{ textbook.textbook.book_title }}</p>
+                                    <p class="text-lg font-semibold">Book Id: {{ textbook.textbook.book_id }}</p>
+                                    <p class="text-lg font-semibold">Title: {{ textbook.textbook.book_title }}</p>
                                     <!-- Form for updating status -->
                                     <form method="post" class="flex items-center mt-2">
                                         {% csrf_token %}
