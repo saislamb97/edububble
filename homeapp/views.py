@@ -7,6 +7,7 @@ from django.contrib import messages
 from .models import ClassName, StudentTextbook, Students, Textbooks, PaymentApplication
 
 
+# User Index Views
 @login_required(login_url='homeapp:login')
 @admin_required
 def IndexView(request):
@@ -30,6 +31,28 @@ def StudentIndexView(request):
     return render(request, 'student/student_index.html', context)
 
 @login_required(login_url='homeapp:login')
+@library_required
+def LibraryIndexView(request):
+    user = request.user
+
+    context = {
+        'user': user,
+    }
+    return render(request, 'library/library_index.html', context)
+
+@login_required(login_url='homeapp:login')
+@finance_required
+def FinanceIndexView(request):
+    user = request.user
+
+    context = {
+        'user': user,
+    }
+    return render(request, 'finance/finance_index.html', context)
+
+
+# User Other Views
+@login_required(login_url='homeapp:login')
 @student_required
 def StudentTextbookView(request):
     user = request.user
@@ -44,15 +67,14 @@ def StudentTextbookView(request):
             class_name = ClassName.objects.get(pk=textbook.classname_id)
             # Retrieve the corresponding StudentTextbook instance
             student_textbook = StudentTextbook.objects.filter(student=student_profile, textbook=textbook).first()
-            if student_textbook:
-                textbooks_with_status.append({
-                    'textbook': textbook,
-                    'class_name': class_name.classname,
-                    'status': student_textbook.status  # Add status information
-                })
+            textbooks_with_status.append({
+                'textbook': textbook,
+                'class_name': class_name.classname,
+                'status': student_textbook.status if student_textbook else 'Not Specified'
+            })
         
         context = {
-            'textbooks_with_status': textbooks_with_status  # Pass textbooks with status to the template
+            'textbooks_with_status': textbooks_with_status
         }
 
         return render(request, 'student/student_textbook.html', context)
@@ -95,16 +117,6 @@ def StudentPaymentApplicationView(request):
         }
         
     return render(request, 'student/student_payment_application.html', context)
-
-@login_required(login_url='homeapp:login')
-@library_required
-def LibraryIndexView(request):
-    user = request.user
-
-    context = {
-        'user': user,
-    }
-    return render(request, 'library/library_index.html', context)
 
 @login_required(login_url='homeapp:login')
 @library_required
@@ -162,16 +174,6 @@ def LibraryTextbookView(request):
 
 @login_required(login_url='homeapp:login')
 @finance_required
-def FinanceIndexView(request):
-    user = request.user
-
-    context = {
-        'user': user,
-    }
-    return render(request, 'finance/finance_index.html', context)
-
-@login_required(login_url='homeapp:login')
-@finance_required
 def FinancePaymentView(request):
     classes = ClassName.objects.all()
     class_students_payments = []
@@ -219,6 +221,9 @@ def FinancePaymentView(request):
     
     return render(request, 'finance/finance_payment.html', context)
 
+
+
+# User Profile and Login Views
 @login_required(login_url='homeapp:login')
 def UserProfileView(request):
     user = request.user
