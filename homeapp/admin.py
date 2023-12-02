@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import User, ClassName, Textbooks, Students, PaymentApplication, StudentTextbook
+from .models import User, ClassName, Textbooks, Students, TextbookStatus
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.forms import UserCreationForm
 
@@ -15,12 +15,12 @@ class UserAdminConfig(UserAdmin):
     add_form = CustomUserCreationForm
 
     search_fields = ('email', 'username', 'fullname')
-    list_filter = ('is_student', 'is_library', 'is_finance', 'is_staff', 'is_active')
+    list_filter = ('is_student', 'is_teacher', 'is_staff', 'is_active')
     ordering = ('email', 'username')
-    list_display = ('email', 'username', 'fullname', 'is_student', 'is_library', 'is_finance', 'is_active',)
+    list_display = ('email', 'username', 'fullname', 'is_student', 'is_teacher', 'is_active',)
     fieldsets = (
         (None, {'fields': ('email', 'username', 'fullname', 'start_date')}),
-        ('Permission', {'fields': ('is_student', 'is_library', 'is_finance', 'is_staff', 'is_active')}),
+        ('Permission', {'fields': ('is_student', 'is_teacher', 'is_staff', 'is_active')}),
     )
     add_fieldsets = (
         (None, {
@@ -53,22 +53,16 @@ class StudentAdminForm(forms.ModelForm):
 
 class StudentConfig(admin.ModelAdmin):
     model = Students
-    list_display = ['username', 'student_id', 'classname', 'section', 'total_credit', 'total_due']
+    list_display = ['username', 'student_id', 'classname', 'section']
     search_fields = ['username__username', 'student_id', 'classname__classname', 'section']
     list_filter = ['username', 'student_id', 'classname', 'section']
     form = StudentAdminForm
 
-class StudentTextbookConfig(admin.ModelAdmin):
-    model = StudentTextbook
+class TextbookStatusConfig(admin.ModelAdmin):
+    model = TextbookStatus
     list_display = ['student', 'textbook', 'status']
     search_fields = ['student__username', 'textbook__book_title']
     list_filter = ['student', 'textbook', 'status']
-
-class PaymentApplicationConfig(admin.ModelAdmin):
-    model = PaymentApplication
-    list_display = ['student', 'application_date', 'paying_amount', 'is_pending', 'is_approved', 'is_rejected']
-    search_fields = ['student__username', 'application_date', 'paying_amount', 'is_pending', 'is_approved', 'is_rejected']
-    list_filter = ['student', 'application_date', 'paying_amount', 'is_pending', 'is_approved', 'is_rejected']
 
 # Change the title of the Django admin site
 admin.site.site_header = 'SMK ORKID DESA Admin Panel'
@@ -79,5 +73,4 @@ admin.site.register(User, UserAdminConfig)
 admin.site.register(ClassName,ClassNameConfig)
 admin.site.register(Textbooks, TextbooksConfig)
 admin.site.register(Students,StudentConfig)
-admin.site.register(StudentTextbook,StudentTextbookConfig)
-admin.site.register(PaymentApplication, PaymentApplicationConfig)
+admin.site.register(TextbookStatus,TextbookStatusConfig)
