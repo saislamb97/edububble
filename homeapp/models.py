@@ -1,10 +1,8 @@
 from django.db import models
-from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
-from django.core.mail import send_mail
-from django.db.models.signals import post_save, m2m_changed, pre_save
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 import random
 
@@ -48,7 +46,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     fullname = models.CharField(max_length=250, blank=True)
     start_date = models.DateTimeField(default=timezone.now)
     is_student = models.BooleanField(default=False)
-    is_teacher = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
 
@@ -59,16 +56,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
-    
-    def clean(self):
-        # Check if the user has multiple roles selected
-        roles_count = sum([self.is_student, self.is_teacher])
-
-        if roles_count > 1:
-            raise ValidationError("A user cannot have multiple roles simultaneously.")
-
+            
     def save(self, *args, **kwargs):
-        self.clean()  # Perform validation before saving
+        if sum([self.is_student, self.is_staff]) > 1:
+            raise ValidationError("A user cannot have multiple roles simultaneously.")
         super().save(*args, **kwargs)
 
 class ClassName(models.Model):
@@ -79,7 +70,7 @@ class ClassName(models.Model):
         ('form4', 'Form 4'),
         ('form5', 'Form 5'),
     ]
-    classname = models.CharField(max_length=250, choices=CLASS_CHOICES)
+    classname = models.CharField(max_length=250, choices=CLASS_CHOICES, unique=True)
     description = models.TextField(blank=True)
 
     def __str__(self):
@@ -108,81 +99,31 @@ class Students(models.Model):
     textbooks = models.ManyToManyField(Textbooks, blank=True)
 
     def __str__(self):
-        return str(self.username)
+        return f"{self.username} - {self.student_id} - {self.classname}"
+    
+class TextbookStatus(models.Model):
+    student = models.ForeignKey(Students, on_delete=models.CASCADE)
+    textbook = models.ForeignKey(Textbooks, on_delete=models.CASCADE)
+    collected = models.BooleanField(default=False)
+    returned = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if sum([self.collected, self.returned]) > 1:
+            raise ValidationError("Only one status can be selected.")
+        super().save(*args, **kwargs)
     
 @receiver(post_save, sender=User)
 def create_or_update_student_profile(sender, instance, created, **kwargs):
     if instance.is_student:
-        # Check if the user is marked as a student
         if created:
-            # If the User instance is newly created and marked as a student
             Students.objects.create(username=instance)
         else:
-            # If the User instance is updated and marked as a student,
-            # get the associated Students instance and update it
             student_profile, _ = Students.objects.get_or_create(username=instance)
-            # Update other fields if needed
             student_profile.save()
     else:
-        # If the user is not marked as a student, delete the associated Students instance
         Students.objects.filter(username=instance).delete()
 
 @receiver(post_save, sender=User)
 def delete_student_profile(sender, instance, **kwargs):
     if not instance.is_student:
-        # If the user is not marked as a student, delete the associated Students instance
         Students.objects.filter(username=instance).delete()
-    
-class TextbookStatus(models.Model):
-    student = models.ForeignKey(Students, on_delete=models.CASCADE)
-    textbook = models.ForeignKey(Textbooks, on_delete=models.CASCADE)
-    STATUS_CHOICES = [
-        ('collected', 'Collected'),
-        ('not_collected', 'Not Collected'),
-        ('returned', 'Returned'),
-    ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    previous_status = models.CharField(max_length=20, blank=True)
-
-    def __str__(self):
-        return f"{self.student.username} - {self.textbook.book_title} - {self.status}"
-    
-@receiver(m2m_changed, sender=Students.textbooks.through)
-def create_student_textbook(sender, instance, action, **kwargs):
-    if action == 'post_add':
-        textbooks = kwargs['pk_set']
-        for textbook_id in textbooks:
-            textbook = get_object_or_404(Textbooks, id=textbook_id)
-            TextbookStatus.objects.create(student=instance, textbook=textbook, status='not_collected')
-
-@receiver(post_save, sender=TextbookStatus)
-def textbook_status_changed(sender, instance, **kwargs):
-    if not kwargs.get('created'):  # Send notifications on updates
-        user_email = instance.student.username.email
-        status = instance.status
-        old_status = instance.previous_status  # Retrieve the previous status from the model field
-        if status != old_status:
-            if status == 'collected':
-                send_collect_notification(user_email)
-            elif status == 'returned':
-                send_return_notification(user_email)
-
-@receiver(pre_save, sender=TextbookStatus)
-def track_previous_status(sender, instance, **kwargs):
-    if instance.pk:  # Check if the instance already exists (update operation)
-        try:
-            old_instance = sender.objects.get(pk=instance.pk)
-            instance.previous_status = old_instance.status  # Track the previous status before saving
-        except sender.DoesNotExist:
-            print("The instance does not exist yet.")
-
-
-def send_collect_notification(email):
-    subject = 'Textbook Status Changed'
-    message = 'You have collected your book.'
-    send_mail(subject, message, 'sa.islamb97@gmail.com', [email])
-
-def send_return_notification(email):
-    subject = 'Textbook Status Changed'
-    message = 'You have returned your book.'
-    send_mail(subject, message, 'sa.islamb97@gmail.com', [email])
