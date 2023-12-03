@@ -2,32 +2,21 @@ from django import forms
 from django.contrib import admin
 from .models import User, ClassName, Textbooks, Students, TextbookStatus
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.forms import UserCreationForm
-
-# Custom form for user creation in the admin panel
-class CustomUserCreationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ('email', 'username', 'fullname', 'password1', 'password2')
-
 
 class UserAdminConfig(UserAdmin):
-    add_form = CustomUserCreationForm
-
-    search_fields = ('email', 'username', 'fullname')
-    list_filter = ('is_student', 'is_teacher', 'is_staff', 'is_active')
-    ordering = ('email', 'username')
-    list_display = ('email', 'username', 'fullname', 'is_student', 'is_teacher', 'is_active',)
     fieldsets = (
-        (None, {'fields': ('email', 'username', 'fullname', 'start_date')}),
-        ('Permission', {'fields': ('is_student', 'is_teacher', 'is_staff', 'is_active')}),
+        (None, {'fields': ('email', 'password')}),
+        ('Personal Info', {'fields': ('username', 'fullname', 'start_date')}),
+        ('Permissions', {'fields': ('is_student', 'is_staff', 'is_active')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'username', 'fullname', 'password1', 'password2')}
-         ),
+            'fields': ('email', 'username', 'password1', 'password2', 'is_student', 'is_staff'),
+        }),
     )
+    list_display = ('username', 'email', 'fullname', 'is_student', 'is_staff', 'is_active')
+    search_fields = ('username', 'email', 'fullname')
 
 class ClassNameConfig(admin.ModelAdmin):
     model = ClassName
@@ -60,9 +49,9 @@ class StudentConfig(admin.ModelAdmin):
 
 class TextbookStatusConfig(admin.ModelAdmin):
     model = TextbookStatus
-    list_display = ['student', 'textbook', 'status']
+    list_display = ['student', 'textbook', 'collected', 'returned']
     search_fields = ['student__username', 'textbook__book_title']
-    list_filter = ['student', 'textbook', 'status']
+    list_filter = ['student', 'textbook', 'collected', 'returned']
 
 # Change the title of the Django admin site
 admin.site.site_header = 'SMK ORKID DESA Admin Panel'

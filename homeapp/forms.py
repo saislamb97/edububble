@@ -1,21 +1,15 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from .models import User
+from .models import TextbookStatus, User
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
         label="Email",
-        widget=forms.EmailInput(attrs={'class': 'text-black border p-2 mt-4 mb-4 rounded w-full', 'placeholder': 'Enter your email.'}),
+        widget=forms.EmailInput(attrs={'class': 'text-black border p-2 mb-4 rounded w-full'}),
     )
     password = forms.CharField(
         label="Password",
-        widget=forms.PasswordInput(attrs={'class': 'text-black border p-2 mt-4 mb-4 rounded w-full', 'placeholder': 'Enter your password.'}),
-    )
-    show_password = forms.BooleanField(
-        required=False,
-        initial=False,
-        widget=forms.CheckboxInput(attrs={'class': 'ml-2'}),
-        label="Show Password",
+        widget=forms.PasswordInput(attrs={'class': 'text-black border p-2 mb-4 rounded w-full'}),
     )
 
     class Meta:
@@ -28,12 +22,21 @@ class UserForm(forms.ModelForm):
         fields = ['email', 'username', 'fullname']
 
         widgets = {
-            'email': forms.EmailInput(attrs={'class': 'border p-2 mt-4 mb-4 rounded w-full'}),
-            'username': forms.TextInput(attrs={'class': 'border p-2 mt-4 mb-4 rounded w-full'}),
-            'fullname': forms.TextInput(attrs={'class': 'border p-2 mt-4 mb-4 rounded w-full'}),
+            'email': forms.EmailInput(attrs={'class': 'border p-2 mb-4 rounded w-full'}),
+            'username': forms.TextInput(attrs={'class': 'border p-2 mb-4 rounded w-full'}),
+            'fullname': forms.TextInput(attrs={'class': 'border p-2 mb-4 rounded w-full'}),
         }
         labels = {
             'email': 'Email',
             'username': 'Username',
             'fullname': 'Full Name',
+        }
+
+class TextbookStatusForm(forms.ModelForm):
+    class Meta:
+        model = TextbookStatus
+        fields = ['collected', 'returned']
+        widgets = {
+            'collected': forms.CheckboxInput(attrs={'class': 'ml-2 checkbox'}),
+            'returned': forms.CheckboxInput(attrs={'class': 'ml-2 checkbox'}),
         }

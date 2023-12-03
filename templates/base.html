@@ -11,15 +11,17 @@
     <script src="https://kit.fontawesome.com/fa133b6a54.js" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-t from-stone-500 to-stone-100 no-scrollbar overflow-y-auto h-full">
+<body class="bg-gradient-to-t from-orange-50 to-orange-300 no-scrollbar overflow-y-auto min-h-screen">
     
-    <header class="bg-gray-900 p-5">
+    <header class="bg-orange-900 p-5">
         {% if request.user.is_authenticated %}
         <nav class="flex flex-col md:flex-row justify-between items-center space-y-5 md:space-y-0 md:space-x-5">
-            <img src="{% static 'images/school_logo.png' %}" alt="logo" class="w-20 h-20 m-5 p-2 bg-orange-500 rounded-md shadow-md">
+            <a href="{% if request.user.is_superuser %}{% url 'homeapp:index' %}{% elif request.user.is_student %}{% url 'homeapp:student_index' %}{% elif request.user.is_staff %}{% url 'homeapp:staff_index' %}{% endif %}">
+                <img src="{% static 'images/school_logo.png' %}" alt="logo" class="w-20 h-20 m-5 p-2 bg-orange-500 rounded-md shadow-md">
+            </a>
             <h1 class="text-2xl md:text-4xl text-white font-bold">WELCOME SMK ORKID DESA</h1>
             <div class="flex flex-col md:flex-row justify-between items-center space-y-5 md:space-y-0 md:space-x-5">
-                <a href="{% if request.user.is_superuser %}{% url 'homeapp:index' %}{% elif request.user.is_student %}{% url 'homeapp:student_index' %}{% elif request.user.is_teacher %}{% url 'homeapp:teacher_index' %}{% endif %}" class="w-40 bg-orange-600 hover:bg-orange-700 text-white font-bold p-5 rounded-md text-center flex justify-center items-center space-x-2">
+                <a href="{% if request.user.is_superuser %}{% url 'homeapp:index' %}{% elif request.user.is_student %}{% url 'homeapp:student_index' %}{% elif request.user.is_staff %}{% url 'homeapp:staff_index' %}{% endif %}" class="w-40 bg-orange-600 hover:bg-orange-700 text-white font-bold p-5 rounded-md text-center flex justify-center items-center space-x-2">
                     <span>Dashboard</span>
                     <i class="fa-solid fa-user-tie"></i>
                 </a>
@@ -44,7 +46,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 py-10 rounded shadow-md">
+    <footer class="bg-orange-900 py-10">
         <p class="font-semibold text-white text-center">&copy; 2023 | FTRdevs | All rights reserved.</p>
     </footer>
 </body>
