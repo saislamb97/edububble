@@ -37,7 +37,7 @@ CREATE TABLE `django_admin_log` (
   CONSTRAINT `django_admin_log_content_type_id_c4bce8eb_fk_django_co` FOREIGN KEY (`content_type_id`) REFERENCES `django_content_type` (`id`),
   CONSTRAINT `django_admin_log_user_id_c564eba6_fk_homeapp_user_id` FOREIGN KEY (`user_id`) REFERENCES `homeapp_user` (`id`),
   CONSTRAINT `django_admin_log_chk_1` CHECK ((`action_flag` >= 0))
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -46,7 +46,7 @@ CREATE TABLE `django_admin_log` (
 
 LOCK TABLES `django_admin_log` WRITE;
 /*!40000 ALTER TABLE `django_admin_log` DISABLE KEYS */;
-INSERT INTO `django_admin_log` VALUES (1,'2023-12-04 13:38:15.284743','2','AHMADWAFIQ',1,'[{\"added\": {}}]',6,1),(2,'2023-12-04 13:39:26.316942','1','Form1',1,'[{\"added\": {}}]',7,1),(3,'2023-12-04 13:39:30.417731','2','Form2',1,'[{\"added\": {}}]',7,1),(4,'2023-12-04 13:39:33.358718','3','Form3',1,'[{\"added\": {}}]',7,1),(5,'2023-12-04 13:39:40.363691','4','Form4',1,'[{\"added\": {}}]',7,1),(6,'2023-12-04 13:39:43.845426','5','Form5',1,'[{\"added\": {}}]',7,1),(7,'2023-12-04 13:41:37.328552','1','AHMADWAFIQ - 563164 - Form1',2,'[{\"changed\": {\"fields\": [\"Classname\", \"Section\"]}}]',8,1);
+INSERT INTO `django_admin_log` VALUES (1,'2023-12-04 13:38:15.284743','2','AHMADWAFIQ',1,'[{\"added\": {}}]',6,1),(2,'2023-12-04 13:39:26.316942','1','Form1',1,'[{\"added\": {}}]',7,1),(3,'2023-12-04 13:39:30.417731','2','Form2',1,'[{\"added\": {}}]',7,1),(4,'2023-12-04 13:39:33.358718','3','Form3',1,'[{\"added\": {}}]',7,1),(5,'2023-12-04 13:39:40.363691','4','Form4',1,'[{\"added\": {}}]',7,1),(6,'2023-12-04 13:39:43.845426','5','Form5',1,'[{\"added\": {}}]',7,1),(7,'2023-12-04 13:41:37.328552','1','AHMADWAFIQ - 563164 - Form1',2,'[{\"changed\": {\"fields\": [\"Classname\", \"Section\"]}}]',8,1),(8,'2023-12-04 13:51:58.282004','1','AHMADWAFIQ - 101002102629 - Form1',2,'[{\"changed\": {\"fields\": [\"Student id\"]}}]',8,1),(9,'2023-12-04 14:00:30.350423','1','BAHASA MELAYU TINGKATAN 1',1,'[{\"added\": {}}]',9,1),(10,'2023-12-04 14:00:41.691297','1','AHMADWAFIQ - 101002102629 - Form1',2,'[{\"changed\": {\"fields\": [\"Textbooks\"]}}]',8,1),(11,'2023-12-04 14:01:04.105560','2','BAHASA MELAYU TINGKATAN 2',1,'[{\"added\": {}}]',9,1),(12,'2023-12-04 14:01:11.742029','3','BAHASA MELAYU TINGKATAN 2',1,'[{\"added\": {}}]',9,1),(13,'2023-12-04 14:01:20.494995','3','BAHASA MELAYU TINGKATAN 2',3,'',9,1),(14,'2023-12-04 14:03:24.889286','3','NEESARAMLI',1,'[{\"added\": {}}]',6,1);
 /*!40000 ALTER TABLE `django_admin_log` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -59,4 +59,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 21:44:41
+-- Dump completed on 2023-12-04 22:11:11
