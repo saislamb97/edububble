@@ -31,7 +31,7 @@ CREATE TABLE `homeapp_textbooks` (
   UNIQUE KEY `book_id` (`book_id`),
   KEY `homeapp_textbooks_classname_id_7e55fa55_fk_homeapp_classname_id` (`classname_id`),
   CONSTRAINT `homeapp_textbooks_classname_id_7e55fa55_fk_homeapp_classname_id` FOREIGN KEY (`classname_id`) REFERENCES `homeapp_classname` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,6 +40,7 @@ CREATE TABLE `homeapp_textbooks` (
 
 LOCK TABLES `homeapp_textbooks` WRITE;
 /*!40000 ALTER TABLE `homeapp_textbooks` DISABLE KEYS */;
+INSERT INTO `homeapp_textbooks` VALUES (1,'BAHASA MELAYU TINGKATAN 1','870568',1),(2,'BAHASA MELAYU TINGKATAN 2','913761',2);
 /*!40000 ALTER TABLE `homeapp_textbooks` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 21:44:40
+-- Dump completed on 2023-12-04 22:11:11

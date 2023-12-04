@@ -43,7 +43,7 @@ CREATE TABLE `homeapp_students` (
 
 LOCK TABLES `homeapp_students` WRITE;
 /*!40000 ALTER TABLE `homeapp_students` DISABLE KEYS */;
-INSERT INTO `homeapp_students` VALUES (1,'563164','EXA',1,2);
+INSERT INTO `homeapp_students` VALUES (1,'101002102629','EXA',1,2);
 /*!40000 ALTER TABLE `homeapp_students` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -56,4 +56,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 21:44:41
+-- Dump completed on 2023-12-04 22:11:11

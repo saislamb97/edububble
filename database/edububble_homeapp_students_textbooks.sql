@@ -31,7 +31,7 @@ CREATE TABLE `homeapp_students_textbooks` (
   KEY `homeapp_students_tex_textbooks_id_4d2b8518_fk_homeapp_t` (`textbooks_id`),
   CONSTRAINT `homeapp_students_tex_students_id_08545a58_fk_homeapp_s` FOREIGN KEY (`students_id`) REFERENCES `homeapp_students` (`id`),
   CONSTRAINT `homeapp_students_tex_textbooks_id_4d2b8518_fk_homeapp_t` FOREIGN KEY (`textbooks_id`) REFERENCES `homeapp_textbooks` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,6 +40,7 @@ CREATE TABLE `homeapp_students_textbooks` (
 
 LOCK TABLES `homeapp_students_textbooks` WRITE;
 /*!40000 ALTER TABLE `homeapp_students_textbooks` DISABLE KEYS */;
+INSERT INTO `homeapp_students_textbooks` VALUES (1,1,1);
 /*!40000 ALTER TABLE `homeapp_students_textbooks` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -52,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 21:44:40
+-- Dump completed on 2023-12-04 22:11:12
