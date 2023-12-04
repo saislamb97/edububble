@@ -64,11 +64,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class ClassName(models.Model):
     CLASS_CHOICES = [
-        ('form1', 'Form 1'),
-        ('form2', 'Form 2'),
-        ('form3', 'Form 3'),
-        ('form4', 'Form 4'),
-        ('form5', 'Form 5'),
+        ('Form1', 'Form1'),
+        ('Form2', 'Form2'),
+        ('Form3', 'Form3'),
+        ('Form4', 'Form4'),
+        ('Form5', 'Form5'),
     ]
     classname = models.CharField(max_length=250, choices=CLASS_CHOICES, unique=True)
     description = models.TextField(blank=True)
@@ -89,11 +89,11 @@ class Students(models.Model):
     student_id = models.CharField(max_length=250, default=generate_unique_id, unique=True)
     classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
     SECTION_CHOICES = [
-        ('sec_a', 'Section A'),
-        ('sec_b', 'Section B'),
-        ('sec_c', 'Section C'),
-        ('sec_d', 'Section D'),
-        ('sec_e', 'Section E'),
+        ('EXA', 'EXA'),
+        ('PETA', 'PETA'),
+        ('TERA', 'TERA'),
+        ('GIGA', 'GIG'),
+        ('MEGA', 'MEGA'),
     ]
     section = models.CharField(max_length=250, blank=True, null=True, choices=SECTION_CHOICES)
     textbooks = models.ManyToManyField(Textbooks, blank=True)
