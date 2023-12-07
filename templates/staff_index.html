@@ -37,9 +37,9 @@
 <div class="container mx-auto p-10 bg-slate-900 min-h-screen text-white rounded-md flex font-sans">
 
     <!-- Left Section: Display all sections -->
-    <div class="w-1/4">
+    <div class="w-2/6">
         {% if selected_class %}
-            <h2 style="font-weight: bold;" class="text-white py-2 px-2 rounded">All Sections</h2>
+            <h2 style="font-weight: bold;" class="text-3xl font-bold text-white py-2 px-2 rounded">All Sections of {{selected_class}}</h2>
             <form method="post">
                 {% csrf_token %}
                 <select name="section_name" class="w-full bg-gray-500 rounded border p-2 mb-4">
@@ -55,7 +55,7 @@
     </div>    
 
     <!-- Right Section: Display students of the selected section with toggle buttons -->
-    <div class="w-2/4 ml-20 flex flex-col items-center font-sans">
+    <div class="w-4/6 ml-20 flex flex-col items-center font-sans">
         {% if selected_class and selected_section %}
             <h2 style="font-weight: bold; font-size: 1.5rem;">Students in Section: {{ selected_section }}</h2>
             {% for class_data in class_students_textbooks %}
@@ -66,28 +66,28 @@
                                 <h3 style="font-weight: bold; font-size: 1.2rem;" class="text-white py-2 px-2 rounded">
                                     Student Name: {{ student_data.student.username }}
                                 </h3>
-                                <button class="w-full bg-gray-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded" onclick="toggleTextbooks('{{ student_data.student.id }}')">Textbooks</button>
-                                <div id="textbooks_{{ student_data.student.id }}" style="display: none;">
-                                    <ul>
+                                <button class="w-full bg-gray-500 hover:bg-slate-700 text-white font-bold p-4 my-5 rounded" onclick="toggleTextbooks('{{ student_data.student.id }}')">Textbooks</button>
+                                <div id="textbooks_{{ student_data.student.id }}" style="display: none;" class="w-5/6">
+                                    <ul class="space-y-4">
                                         {% for textbook_info in student_data.textbooks %}
-                                            <li>
-                                                <form method="post">
+                                            <li class="border-2 p-2 rounded">
+                                                <form method="post" class="w-full flex flex-wrap items-center justify-between">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
                                                     <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
                                                     <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
                                                     <input type="hidden" name="textbook_id" value="{{ textbook_info.textbook.id }}">
                                                     
-                                                    <span style="font-weight: 600;">{{ textbook_info.textbook.book_title }}:</span>
+                                                    <span style="font-weight: 600;" class="mr-4">{{ textbook_info.textbook.book_title }}:</span>
                                                     
                                                     <!-- Textbook status update checkboxes -->
                                                     <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} onclick="uncheckOther('returned_{{ textbook_info.textbook.id }}')">
-                                                    <label for="collected_{{ textbook_info.textbook.id }}">Collected</label>
+                                                    <label for="collected_{{ textbook_info.textbook.id }}" class="mr-4">Collected</label>
                                                     
                                                     <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} onclick="uncheckOther('collected_{{ textbook_info.textbook.id }}')">
-                                                    <label for="returned_{{ textbook_info.textbook.id }}">Returned</label>
+                                                    <label for="returned_{{ textbook_info.textbook.id }}" class="mr-4">Returned</label>
                                                     
-                                                    <button type="submit" name="statusform" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-2 m-2 rounded">Update</button>
+                                                    <button type="submit" name="statusform" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-2 ml-auto rounded">Update</button>
                                                 </form>
                                             </li>
                                         {% endfor %}

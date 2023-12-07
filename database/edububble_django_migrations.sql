@@ -28,7 +28,7 @@ CREATE TABLE `django_migrations` (
   `name` varchar(255) NOT NULL,
   `applied` datetime(6) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,7 +37,7 @@ CREATE TABLE `django_migrations` (
 
 LOCK TABLES `django_migrations` WRITE;
 /*!40000 ALTER TABLE `django_migrations` DISABLE KEYS */;
-INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2023-12-04 13:33:02.712369'),(2,'contenttypes','0002_remove_content_type_name','2023-12-04 13:33:02.869084'),(3,'auth','0001_initial','2023-12-04 13:33:03.636521'),(4,'auth','0002_alter_permission_name_max_length','2023-12-04 13:33:03.706547'),(5,'auth','0003_alter_user_email_max_length','2023-12-04 13:33:03.711984'),(6,'auth','0004_alter_user_username_opts','2023-12-04 13:33:03.718122'),(7,'auth','0005_alter_user_last_login_null','2023-12-04 13:33:03.722492'),(8,'auth','0006_require_contenttypes_0002','2023-12-04 13:33:03.726520'),(9,'auth','0007_alter_validators_add_error_messages','2023-12-04 13:33:03.733149'),(10,'auth','0008_alter_user_username_max_length','2023-12-04 13:33:03.735893'),(11,'auth','0009_alter_user_last_name_max_length','2023-12-04 13:33:03.741100'),(12,'auth','0010_alter_group_name_max_length','2023-12-04 13:33:03.759533'),(13,'auth','0011_update_proxy_permissions','2023-12-04 13:33:03.766232'),(14,'auth','0012_alter_user_first_name_max_length','2023-12-04 13:33:03.847799'),(15,'homeapp','0001_initial','2023-12-04 13:33:05.519113'),(16,'admin','0001_initial','2023-12-04 13:33:05.857146'),(17,'admin','0002_logentry_remove_auto_add','2023-12-04 13:33:05.865659'),(18,'admin','0003_logentry_add_action_flag_choices','2023-12-04 13:33:05.878896'),(19,'sessions','0001_initial','2023-12-04 13:33:05.921115');
+INSERT INTO `django_migrations` VALUES (1,'contenttypes','0001_initial','2023-12-04 07:39:36.337195'),(2,'contenttypes','0002_remove_content_type_name','2023-12-04 07:39:36.425114'),(3,'auth','0001_initial','2023-12-04 07:39:36.787198'),(4,'auth','0002_alter_permission_name_max_length','2023-12-04 07:39:36.888451'),(5,'auth','0003_alter_user_email_max_length','2023-12-04 07:39:36.897764'),(6,'auth','0004_alter_user_username_opts','2023-12-04 07:39:36.907005'),(7,'auth','0005_alter_user_last_login_null','2023-12-04 07:39:36.915530'),(8,'auth','0006_require_contenttypes_0002','2023-12-04 07:39:36.922266'),(9,'auth','0007_alter_validators_add_error_messages','2023-12-04 07:39:36.932019'),(10,'auth','0008_alter_user_username_max_length','2023-12-04 07:39:36.940903'),(11,'auth','0009_alter_user_last_name_max_length','2023-12-04 07:39:36.950268'),(12,'auth','0010_alter_group_name_max_length','2023-12-04 07:39:36.971175'),(13,'auth','0011_update_proxy_permissions','2023-12-04 07:39:36.982344'),(14,'auth','0012_alter_user_first_name_max_length','2023-12-04 07:39:36.992897'),(15,'homeapp','0001_initial','2023-12-04 07:39:38.055897'),(16,'admin','0001_initial','2023-12-04 07:39:38.231299'),(17,'admin','0002_logentry_remove_auto_add','2023-12-04 07:39:38.244013'),(18,'admin','0003_logentry_add_action_flag_choices','2023-12-04 07:39:38.256874'),(19,'homeapp','0002_rename_is_library_user_is_teacher_and_more','2023-12-04 07:39:38.344648'),(20,'homeapp','0003_remove_students_total_credit_and_more','2023-12-04 07:39:38.419321'),(21,'homeapp','0004_remove_textbookstatus_previous_status_and_more','2023-12-04 07:39:38.587689'),(22,'homeapp','0005_alter_classname_classname_alter_textbooks_book_title','2023-12-04 07:39:38.675749'),(23,'homeapp','0006_remove_user_is_teacher','2023-12-04 07:39:38.724614'),(24,'sessions','0001_initial','2023-12-04 07:39:38.771601');
 /*!40000 ALTER TABLE `django_migrations` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 22:11:11
+-- Dump completed on 2023-12-07 22:13:20
