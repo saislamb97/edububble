@@ -24,16 +24,16 @@ DROP TABLE IF EXISTS `homeapp_textbookstatus`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `homeapp_textbookstatus` (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `collected` tinyint(1) NOT NULL,
-  `returned` tinyint(1) NOT NULL,
   `student_id` bigint NOT NULL,
   `textbook_id` bigint NOT NULL,
+  `collected` tinyint(1) NOT NULL,
+  `returned` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `homeapp_textbookstat_student_id_020b62fe_fk_homeapp_s` (`student_id`),
   KEY `homeapp_textbookstat_textbook_id_81b5d78b_fk_homeapp_t` (`textbook_id`),
   CONSTRAINT `homeapp_textbookstat_student_id_020b62fe_fk_homeapp_s` FOREIGN KEY (`student_id`) REFERENCES `homeapp_students` (`id`),
   CONSTRAINT `homeapp_textbookstat_textbook_id_81b5d78b_fk_homeapp_t` FOREIGN KEY (`textbook_id`) REFERENCES `homeapp_textbooks` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -42,7 +42,6 @@ CREATE TABLE `homeapp_textbookstatus` (
 
 LOCK TABLES `homeapp_textbookstatus` WRITE;
 /*!40000 ALTER TABLE `homeapp_textbookstatus` DISABLE KEYS */;
-INSERT INTO `homeapp_textbookstatus` VALUES (1,1,0,1,1);
 /*!40000 ALTER TABLE `homeapp_textbookstatus` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 22:11:12
+-- Dump completed on 2023-12-07 22:13:21

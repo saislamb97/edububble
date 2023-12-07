@@ -100,44 +100,35 @@ def retrieve_students_by_class_and_section(selected_class, section_name):
     students = Students.objects.filter(classname=selected_class, section=section_name)
     class_students_textbooks = []
 
-    for student in students:
-        textbooks = student.textbooks.all()
-        textbooks_with_status = []
+    sections = Students.objects.filter(classname=selected_class).values_list('section', flat=True).distinct()
 
-        for textbook in textbooks:
-            textbook_status, _ = TextbookStatus.objects.get_or_create(student=student, textbook=textbook)
-            textbooks_with_status.append({
-                'textbook': textbook,
-                'status': textbook_status,
+    for section in sections:
+        section_students = students.filter(section=section)
+        class_students = []
+
+        for student in section_students:
+            textbooks = student.textbooks.all()
+            textbooks_with_status = []
+
+            for textbook in textbooks:
+                textbook_status, _ = TextbookStatus.objects.get_or_create(student=student, textbook=textbook)
+                textbooks_with_status.append({
+                    'textbook': textbook,
+                    'status': textbook_status,
+                })
+
+            class_students.append({
+                'student': student,
+                'textbooks': textbooks_with_status,
             })
 
         class_students_textbooks.append({
             'class_obj': selected_class,
-            'class_students': [{
-                'student': student,
-                'textbooks': textbooks_with_status,
-            }],
+            'section': section,
+            'class_students': class_students,
         })
 
     return class_students_textbooks
-
-def update_textbook_status(request):
-    # Extract and update textbook status
-    student_id = request.POST.get('student_id')
-    textbook_id = request.POST.get('textbook_id')
-    collected = request.POST.get('collected')
-    returned = request.POST.get('returned')
-
-    student = get_object_or_404(Students, id=student_id)
-    textbook = get_object_or_404(Textbooks, id=textbook_id)
-    textbook_status = get_object_or_404(TextbookStatus, student=student, textbook=textbook)
-
-    # Update status based on checkbox selections
-    textbook_status.collected = collected is not None
-    textbook_status.returned = returned is not None
-    textbook_status.save()
-
-    messages.success(request, 'Textbook status updated.')
 
 def retrieve_class_data(selected_class):
     class_students_textbooks = []
@@ -170,6 +161,24 @@ def retrieve_class_data(selected_class):
         })
 
     return class_students_textbooks
+
+def update_textbook_status(request):
+    # Extract and update textbook status
+    student_id = request.POST.get('student_id')
+    textbook_id = request.POST.get('textbook_id')
+    collected = request.POST.get('collected')
+    returned = request.POST.get('returned')
+
+    student = get_object_or_404(Students, id=student_id)
+    textbook = get_object_or_404(Textbooks, id=textbook_id)
+    textbook_status = get_object_or_404(TextbookStatus, student=student, textbook=textbook)
+
+    # Update status based on checkbox selections
+    textbook_status.collected = collected is not None
+    textbook_status.returned = returned is not None
+    textbook_status.save()
+
+    messages.success(request, 'Textbook status updated.')
 
 # User Profile and Login Views
 @login_required(login_url='homeapp:login')

@@ -44,7 +44,7 @@ class StudentConfig(admin.ModelAdmin):
     model = Students
     list_display = ['username', 'student_id', 'classname', 'section']
     search_fields = ['username__username', 'student_id', 'classname__classname', 'section']
-    list_filter = ['username', 'student_id', 'classname', 'section']
+    list_filter = ['classname', 'section']
     form = StudentAdminForm
 
 class TextbookStatusConfig(admin.ModelAdmin):

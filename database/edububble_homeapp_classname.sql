@@ -27,7 +27,7 @@ CREATE TABLE `homeapp_classname` (
   `classname` varchar(250) NOT NULL,
   `description` longtext NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `classname` (`classname`)
+  UNIQUE KEY `homeapp_classname_classname_72561d87_uniq` (`classname`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-04 22:11:12
+-- Dump completed on 2023-12-07 22:13:20
