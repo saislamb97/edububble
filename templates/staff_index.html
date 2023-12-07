@@ -3,21 +3,30 @@
 {% block content %}
 
 {% if messages %}
-        <div class="bg-orange-200 p-2 text-center text-stone-800">
-            <ul>
-                {% for message in messages %}
-                <li>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+    <div class="bg-emerald-600 p-2 text-center text-white font-sans">
+        <ul>
+            {% for message in messages %}
+                <li style="font-weight: bold;">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endif %}
 
-<div class="container mx-auto p-10 text-orange-800">
+<div class="container mx-auto p-10 text-white font-sans"> 
+
+    <!-- Textbook Management Section -->
+    <div class="text-center">
+        <h1 class="text-3xl text-white font-bold py-2 mb-10 border-b-4 border-white">
+            <i class="fa-solid fa-book text-white text-6xl inline-block align-middle"></i>
+            <span class="align-middle ml-2 block">Textbooks Management</span>
+        </h1>
+    </div> 
+  
     <!-- Display buttons for each class -->
     <form method="post" class="flex justify-between items-center">
         {% csrf_token %}
         {% for class_data in all_classes %}
-            <button type="submit" name="class_id" value="{{ class_data.id }}" class="w-full bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded m-2">
+            <button type="submit" name="class_id" value="{{ class_data.id }}" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded m-2">
                 Class: {{ class_data.classname }}
             </button>
         {% endfor %}
@@ -25,59 +34,63 @@
 </div>    
 
 <!-- Bottom Section for Forms and Content -->
-<div class="container mx-auto p-10 bg-orange-300 min-h-screen text-orange-800 rounded-md flex">
+<div class="container mx-auto p-10 bg-slate-900 min-h-screen text-white rounded-md flex font-sans">
+
     <!-- Left Section: Display all sections -->
     <div class="w-1/4">
         {% if selected_class %}
-            <h2>All Sections</h2>
+            <h2 style="font-weight: bold;" class="text-white py-2 px-2 rounded">All Sections</h2>
             <form method="post">
                 {% csrf_token %}
-                <select name="section_name" class="w-full bg-white rounded border p-2 mb-4">
+                <select name="section_name" class="w-full bg-gray-500 rounded border p-2 mb-4">
                     <option value="" selected disabled>Select Section</option>
                     {% for class_data in class_students_textbooks %}
                         <option value="{{ class_data.section }}">{{ class_data.section }}</option>
                     {% endfor %}
                 </select>
                 <input type="hidden" name="class_section_id" value="{{ selected_class.id }}">
-                <button type="submit" name="class_section_form" class="w-full bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded">Filter Students</button>
+                <button type="submit" name="class_section_form" class="w-full bg-gray-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded">Filter Students</button>
             </form>
         {% endif %}
     </div>    
 
-    <!-- Right Section: Display students of selected section with toggle buttons -->
-    <div class="w-2/4 ml-20 flex flex-col items-center">
+    <!-- Right Section: Display students of the selected section with toggle buttons -->
+    <div class="w-2/4 ml-20 flex flex-col items-center font-sans">
         {% if selected_class and selected_section %}
-            <h2>Students in Section {{ selected_section }}</h2>
+            <h2 style="font-weight: bold; font-size: 1.5rem;">Students in Section: {{ selected_section }}</h2>
             {% for class_data in class_students_textbooks %}
                 {% if class_data.class_obj.id == selected_class.id %}
                     {% for student_data in class_data.class_students %}
                         {% if student_data.student.section == selected_section %}
                             <div class="border p-4 mb-4 rounded w-full flex flex-col items-center">
-                                <h3>Student: {{ student_data.student.username }}</h3>
-                                <button class="w-full bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" onclick="toggleTextbooks('{{ student_data.student.id }}')">Textbooks</button>
+                                <h3 style="font-weight: bold; font-size: 1.2rem;" class="text-white py-2 px-2 rounded">
+                                    Student Name: {{ student_data.student.username }}
+                                </h3>
+                                <button class="w-full bg-gray-500 hover:bg-slate-700 text-white font-bold py-2 px-4 rounded" onclick="toggleTextbooks('{{ student_data.student.id }}')">Textbooks</button>
                                 <div id="textbooks_{{ student_data.student.id }}" style="display: none;">
                                     <ul>
                                         {% for textbook_info in student_data.textbooks %}
-                                        <li>
-                                        <form method="post">
-                                            {% csrf_token %}
-                                                <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
-                                                <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
-                                                <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
-                                                <input type="hidden" name="textbook_id" value="{{ textbook_info.textbook.id }}">
-                                                
-                                                {{ textbook_info.textbook.book_title }} : 
-                                                
-                                                <!-- Textbook status update checkboxes -->
-                                                <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} onclick="uncheckOther('returned_{{ textbook_info.textbook.id }}')">
-                                                <label for="collected_{{ textbook_info.textbook.id }}">Collected</label>
-                                                
-                                                <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} onclick="uncheckOther('collected_{{ textbook_info.textbook.id }}')">
-                                                <label for="returned_{{ textbook_info.textbook.id }}">Returned</label>
-                                            <button type="submit" name="statusform" class="bg-orange-500 hover:bg-orange-700 text-white font-bold p-2 m-2 rounded">Update</button>
-                                        </form>
-                                    </li>
-                                    {% endfor %}
+                                            <li>
+                                                <form method="post">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
+                                                    <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
+                                                    <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
+                                                    <input type="hidden" name="textbook_id" value="{{ textbook_info.textbook.id }}">
+                                                    
+                                                    <span style="font-weight: 600;">{{ textbook_info.textbook.book_title }}:</span>
+                                                    
+                                                    <!-- Textbook status update checkboxes -->
+                                                    <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} onclick="uncheckOther('returned_{{ textbook_info.textbook.id }}')">
+                                                    <label for="collected_{{ textbook_info.textbook.id }}">Collected</label>
+                                                    
+                                                    <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} onclick="uncheckOther('collected_{{ textbook_info.textbook.id }}')">
+                                                    <label for="returned_{{ textbook_info.textbook.id }}">Returned</label>
+                                                    
+                                                    <button type="submit" name="statusform" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-2 m-2 rounded">Update</button>
+                                                </form>
+                                            </li>
+                                        {% endfor %}
                                     </ul>
                                 </div>
                             </div>
@@ -86,27 +99,23 @@
                 {% endif %}
             {% endfor %}
         {% endif %}
-    </div>
-</div>
+    </div>   
 
-<script>
-    function toggleTextbooks(studentId) {
-        const textbooksDiv = document.getElementById(`textbooks_${studentId}`);
-        textbooksDiv.style.display = textbooksDiv.style.display === 'none' ? 'block' : 'none';
-    }
-</script>
-<script>
-    function uncheckOther(checkboxId) {
-        const otherCheckbox = document.getElementById(checkboxId);
-        const currentCheckbox = document.activeElement;
-
-        if (currentCheckbox.checked && otherCheckbox.checked) {
-            otherCheckbox.checked = false;
+    <script>
+        function toggleTextbooks(studentId) {
+            const textbooksDiv = document.getElementById(`textbooks_${studentId}`);
+            textbooksDiv.style.display = textbooksDiv.style.display === 'none' ? 'block' : 'none';
         }
-    }
-</script>
+    </script>
+    <script>
+        function uncheckOther(checkboxId) {
+            const otherCheckbox = document.getElementById(checkboxId);
+            const currentCheckbox = document.activeElement;
 
-
-
+            if (currentCheckbox.checked && otherCheckbox.checked) {
+                otherCheckbox.checked = false;
+            }
+        }
+    </script>
 
 {% endblock %}

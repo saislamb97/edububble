@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if messages %}
-        <div class="bg-orange-200 p-2 text-center text-stone-800">
+        <div class="bg-emerald-600 p-2 text-center text-white font-sans">
             <ul>
                 {% for message in messages %}
                 <li>{{ message }}</li>
@@ -12,24 +12,24 @@
         </div>
 {% endif %}
 
-<div class="container max-w-2xl mx-auto p-10 bg-orange-300 text-orange-800 rounded-md min-h-screen">
+<div class="container max-w-2xl mx-auto p-10 bg-slate-900 text-black rounded-md min-h-screen">
 
   <!-- Personal Information Section -->
   <div class="text-center">
-    <h1 class="text-3xl text-black font-bold py-2 mb-10 border-b-4">
-      <i class="fa-solid fa-address-card text-orange-900 text-6xl inline-block align-middle"></i>
+    <h1 class="text-3xl text-white font-bold py-2 mb-10 border-b-4">
+      <i class="fa-solid fa-address-card text-black-900 text-6xl inline-block align-middle"></i>
       <span class="align-middle ml-2 block">Personal Information</span>
     </h1>
   </div>
 
   <!-- User Form Section -->
-  <div class="mx-auto bg-orange-400 text-black font-semibold rounded-xl p-6">
+  <div class="mx-auto bg-gray-500 text-black font-bold rounded-xl p-6">
     <form method="post" class="space-y-4">
       {% csrf_token %}
-      {{ userform.as_p }}
+      {{ userform.as_p|safe }} {# Use |safe to render HTML with formatting #}
 
       <!-- Update Button -->
-      <button id="login" type="submit" class="w-full bg-orange-500 hover:bg-orange-700 text-white font-bold p-4 mt-4 rounded">Update</button>
+      <button id="login" type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-4 mt-4 rounded">Update</button>
     </form>
   </div>
 

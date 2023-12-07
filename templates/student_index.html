@@ -2,23 +2,23 @@
 {% block title %}Student Home{% endblock %}
 {% block content %}
 
-<div class="container mx-auto p-10 bg-orange-300 min-h-screen text-orange-800 flex flex-col justify-center items-center rounded-md">
+<div class="container mx-auto p-10 bg-slate-900 min-h-screen text-white flex flex-col justify-center items-center rounded-md">
     <h1 class="text-4xl font-bold mb-6 text-center flex flex-col justify-center items-center">
-        <i class="fas fa-book text-orange-600 text-6xl mb-4"></i>
-        Student Textbooks
+        <i class="fas fa-book text-white text-6xl mb-4"></i>
+        <span class="font-bold">Student Textbooks</span>
     </h1>
 
     <div class="flex justify-center items-center flex-wrap w-full">
         {% for textbook in textbooks_with_status %}
             {% if forloop.counter0|divisibleby:3 %}<div class="w-full"></div>{% endif %}
             <div class="w-full md:w-80 p-4">
-                <div class="card bg-orange-200 rounded-lg shadow-md p-4">
+                <div class="card bg-gray-500 rounded-lg shadow-md p-4">
                     <div class="mb-2">
-                        <p class="text-lg font-semibold">Book Id: {{ textbook.textbook.book_id }}</p>
-                        <p class="text-lg font-semibold">Title: {{ textbook.textbook.book_title }}</p>
-                        <p class="text-lg font-semibold">Class: {{ textbook.class_name }}</p>
-                        <p class="text-lg font-semibold">Status:
-                            <span class="{% if textbook.status == 'Collected' %}text-green-600{% elif textbook.status == 'Returned' %}text-orange-600{% else %}text-red-600{% endif %}">
+                        <p class="text-lg font-bold">Book Id: {{ textbook.textbook.book_id }}</p>
+                        <p class="text-lg font-bold">Title: {{ textbook.textbook.book_title }}</p>
+                        <p class="text-lg font-bold">Class: {{ textbook.class_name }}</p>
+                        <p class="text-lg font-bold">Status:
+                            <span class="{% if textbook.status == 'Collected' %}text-green-500 font-semibold{% elif textbook.status == 'Returned' %}text-sky-500 font-semibold{% else %}text-rose-500 font-semibold{% endif %}">
                                 {{ textbook.status }}
                             </span>
                         </p>
@@ -28,6 +28,5 @@
         {% endfor %}
     </div>
 </div>
-
 
 {% endblock %}

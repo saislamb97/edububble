@@ -6,21 +6,21 @@
         <div class="bg-orange-200 p-2 text-center text-stone-800">
             <ul>
                 {% for message in messages %}
-                <li>{{ message }}</li>
+                <li class="font-bold">{{ message }}</li>
                 {% endfor %}
             </ul>
         </div>
 {% endif %}
 
-<div class="container mx-auto p-10 bg-orange-300 min-h-screen text-orange-800 flex justify-center items-center rounded-md">
+<div class="container mx-auto p-10 bg-slate-900 min-h-screen text-black flex justify-center items-center rounded-md">
     <div class="max-w-lg w-full bg-white rounded-lg shadow-md p-8">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-orange-800">Welcome, {{ user }}!</h1>
+            <h1 class="text-4xl font-bold text-slate-600">Welcome, <span class="font-bold">{{ user }}</span>!</h1>
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <a href="{% url 'admin:index' %}" class="col-span-2 bg-orange-600 hover:bg-orange-700 text-white font-bold py-6 rounded-md text-center flex justify-center items-center space-x-2">
-                <span>Go to Admin Panel</span>
+            <a href="{% url 'admin:index' %}" class="col-span-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-6 rounded-md text-center flex justify-center items-center space-x-2">
+                <span class="font-bold">Go to Admin Panel</span>
                 <i class="fa-solid fa-user-tie"></i>
             </a>
         </div>
