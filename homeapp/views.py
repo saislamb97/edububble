@@ -60,6 +60,7 @@ def StaffIndexView(request):
     classes = ClassName.objects.all()
     class_students_textbooks = []
     selected_class = None
+    selected_student = None
     section_name = None
 
     if request.method == 'POST':
@@ -71,13 +72,18 @@ def StaffIndexView(request):
                 # Retrieve and display data for the selected class_id after update
                 selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
                 section_name = request.POST.get('selected_section_id')
+                student_id = request.POST.get('student_id')
+                selected_student = get_object_or_404(Students, id=student_id)
                 class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
-            
-        elif 'class_id' in request.POST:
-            # Retrieve and display data for the selected class_id
-            selected_class = get_object_or_404(ClassName, id=request.POST.get('class_id'))
-            class_students_textbooks = retrieve_class_data(selected_class)
 
+        elif 'section_student_form' in request.POST:
+            # Form submission to filter students by class ID and section name
+            selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
+            section_name = request.POST.get('selected_section_id')
+            student_id = request.POST.get('student_id')
+            selected_student = get_object_or_404(Students, id=student_id)
+            class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
+            
         elif 'class_section_form' in request.POST:
             # Form submission to filter students by class ID and section name
             class_section_id = request.POST.get('class_section_id')
@@ -85,10 +91,16 @@ def StaffIndexView(request):
             selected_class = get_object_or_404(ClassName, id=class_section_id)
             class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
 
+        elif 'class_id' in request.POST:
+            # Retrieve and display data for the selected class_id
+            selected_class = get_object_or_404(ClassName, id=request.POST.get('class_id'))
+            class_students_textbooks = retrieve_class_data(selected_class)
+
     context = {
         'class_students_textbooks': class_students_textbooks,
         'textbookstatusform': textbookstatusform,
         'selected_class': selected_class,
+        'selected_student':selected_student,
         'selected_section': section_name,
         'all_classes': classes,
     }
