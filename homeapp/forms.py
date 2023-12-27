@@ -4,8 +4,8 @@ from .models import TextbookStatus, User
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        label="Email",
-        widget=forms.EmailInput(attrs={'class': 'text-black border p-2 mb-4 rounded w-full'}),
+        label="Username",
+        widget=forms.TextInput(attrs={'class': 'text-black border p-2 mb-4 rounded w-full'}),
     )
     password = forms.CharField(
         label="Password",

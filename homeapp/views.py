@@ -5,7 +5,9 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, TextbookStatusForm, UserForm
 from .decorators import admin_required, student_required, staff_required
 from django.contrib import messages
-from .models import ClassName, TextbookStatus, Students, Textbooks
+from .models import ClassName, TextbookStatus, Students, Textbooks, update_available_quantity
+from django.db.models import Count
+import plotly.express as px
 
 
 # User Index Views
@@ -24,32 +26,53 @@ def IndexView(request):
 @student_required
 def StudentIndexView(request):
     user = request.user
-    
+    classes = ClassName.objects.all()
+    student = None
+
+    chart_data_for_classes = []
+    for class_obj in classes:
+        chart_data = generate_textbook_status_chart(class_obj, user)
+        chart_data_for_classes.append(chart_data)
+
+    # Query the Students model using the logged-in user
+    try:
+        student = Students.objects.get(username=user)
+    except Students.DoesNotExist:
+        # Handle case where the student doesn't exist for the logged-in user
+        print("Student information not found.")
+
     # Retrieve student profile or return 404 if it doesn't exist
     student_profile = get_object_or_404(Students, username=user)
     user_textbooks = student_profile.textbooks.all()
-    
     textbooks_with_status = []
-    for textbook in user_textbooks:
-        class_name = textbook.classname.classname  # Access classname directly from ForeignKey
-        # Retrieve the corresponding TextbookStatus instance if it exists
-        textbook_status = TextbookStatus.objects.filter(student=student_profile, textbook=textbook).first()
-        status = 'Not Specified'  # Default status if no textbook status found
-        if textbook_status:
-            if textbook_status.collected:
-                status = 'Collected'
-            elif textbook_status.returned:
-                status = 'Returned'
-        
-        textbooks_with_status.append({
-            'textbook': textbook,
-            'class_name': class_name,
-            'status': status
-        })
-    
+
+    if request.method == 'POST' and 'class_id' in request.POST:
+        # Retrieve the selected class
+        selected_class = get_object_or_404(ClassName, id=request.POST.get('class_id'))
+
+        # Filter textbooks based on the selected class without modifying user_textbooks
+        textbooks_for_class = Textbooks.objects.filter(classname=selected_class)
+
+        for textbook in user_textbooks:
+            if textbook in textbooks_for_class:  # Check if the textbook belongs to the selected class
+                class_name = textbook.classname.classname
+                textbook_status = TextbookStatus.objects.filter(student=student_profile, textbook=textbook).first()
+                status = 'Not Specified'  # Default status if no textbook status found
+                if textbook_status:
+                    status = 'Collected' if textbook_status.collected else ('Returned' if textbook_status.returned else 'Not Specified')
+
+                textbooks_with_status.append({
+                    'textbook': textbook,
+                    'class_name': class_name,
+                    'status': status
+                })
+
     context = {
         'textbooks_with_status': textbooks_with_status,
         'user': user,
+        'all_classes': classes,
+        'student': student,
+        'chart_data_for_classes': chart_data_for_classes,
     }
     return render(request, 'student_index.html', context)
 
@@ -62,6 +85,11 @@ def StaffIndexView(request):
     selected_class = None
     selected_student = None
     section_name = None
+
+    chart_data_for_classes = []
+    for class_obj in classes:
+        chart_data = generate_textbook_status_chart_for_class(class_obj)
+        chart_data_for_classes.append(chart_data)
 
     if request.method == 'POST':
         if 'statusform' in request.POST:
@@ -103,9 +131,81 @@ def StaffIndexView(request):
         'selected_student':selected_student,
         'selected_section': section_name,
         'all_classes': classes,
+        'chart_data_for_classes': chart_data_for_classes,
     }
 
     return render(request, 'staff_index.html', context)
+
+@login_required(login_url='homeapp:login')
+@staff_required
+def AllTextbookView(request):
+    textbooks_by_class = {}
+    all_textbooks = Textbooks.objects.all()
+    textbooks_by_class = {}
+
+    # Group textbooks by classname
+    for textbook in all_textbooks:
+        class_name = getattr(textbook.classname, 'classname', None)
+        if class_name:
+            if class_name not in textbooks_by_class:
+                textbooks_by_class[class_name] = []
+            textbooks_by_class[class_name].append(textbook)
+        else:
+            print(f"Skipping textbook with ID {textbook.id} as classname is None.")
+
+    return render(request, 'alltextbook.html', {'textbooks_by_class': textbooks_by_class})
+
+def generate_textbook_status_chart(class_name, user):
+    class_textbooks = Textbooks.objects.filter(classname=class_name)
+
+    collected_count = TextbookStatus.objects.filter(textbook__in=class_textbooks, student__username=user, collected=True).count()
+    returned_count = TextbookStatus.objects.filter(textbook__in=class_textbooks, student__username=user, returned=True).count()
+    not_specified_count = class_textbooks.count() - (collected_count + returned_count)
+
+    counts = {
+        'collected': collected_count,
+        'returned': returned_count,
+        'not_specified': not_specified_count
+    }
+
+    fig = px.pie(values=list(counts.values()), names=list(counts.keys()), title=class_name.classname)
+    fig.update_traces(textinfo='percent+label', hole=0.4)
+
+    chart_div = fig.to_html(full_html=False, include_plotlyjs='cdn')
+    return {
+        'chart_div': chart_div,
+        'counts': counts
+    }
+
+def generate_textbook_status_chart_for_class(class_name):
+    # Retrieve all students in the specified class
+    students_in_class = Students.objects.filter(classname=class_name)
+
+    # Retrieve textbooks for all students in the class
+    textbooks_for_class_students = Textbooks.objects.filter(students__in=students_in_class).distinct()
+
+    # Calculate counts for textbook statuses
+    collected_count = TextbookStatus.objects.filter(textbook__in=textbooks_for_class_students, collected=True).count()
+    returned_count = TextbookStatus.objects.filter(textbook__in=textbooks_for_class_students, returned=True).count()
+    not_specified_count = textbooks_for_class_students.count() - (collected_count + returned_count)
+
+    # Prepare counts dictionary
+    counts = {
+        'collected': collected_count,
+        'returned': returned_count,
+        'not_specified': not_specified_count
+    }
+
+    # Create pie chart
+    fig = px.pie(values=list(counts.values()), names=list(counts.keys()), title=class_name.classname)
+    fig.update_traces(textinfo='percent+label', hole=0.4)
+
+    chart_div = fig.to_html(full_html=False, include_plotlyjs='cdn')
+    
+    return {
+        'chart_div': chart_div,
+        'counts': counts
+    }
 
 def retrieve_students_by_class_and_section(selected_class, section_name):
     # Retrieve students that match the given class ID and section name
@@ -189,6 +289,9 @@ def update_textbook_status(request):
     textbook_status.collected = collected is not None
     textbook_status.returned = returned is not None
     textbook_status.save()
+
+    # Call the update_available_quantity logic after saving TextbookStatus
+    update_available_quantity(sender=TextbookStatus, instance=textbook_status)
 
     messages.success(request, 'Textbook status updated.')
 
