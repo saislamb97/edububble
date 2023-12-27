@@ -85,36 +85,53 @@
                             {% if student_data.student.id == selected_student.id %}
                                 <div class="border p-4 mb-4 rounded w-full flex flex-col items-center">
                                     <h3 class="text-3xl font-bold text-white text-center p-4 m-4 rounded">
-                                        {{ student_data.student.username }}
+                                        {% if student_data.student.username.fullname %}
+                                            {{ student_data.student.username.fullname }}
+                                        {% else %}
+                                            {{ student_data.student.username.username }}
+                                        {% endif %}
                                     </h3>
-                                    <div id="textbooks_{{ student_data.student.id }}" class="w-5/6">
-                                        <ul class="space-y-4">
-                                            {% for textbook_info in student_data.textbooks %}
-                                                {% if textbook_info.textbook.classname == selected_class %}
-                                                <li class="border-2 p-2 rounded">
-                                                    <form method="post" class="w-full flex flex-wrap items-center justify-between">
-                                                        {% csrf_token %}
-                                                        <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
-                                                        <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
-                                                        <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
-                                                        <input type="hidden" name="textbook_id" value="{{ textbook_info.textbook.id }}">
-                                                        
-                                                        <span style="font-weight: 600;" class="mr-4">{{ textbook_info.textbook.book_title }}:</span>
-                                                        
-                                                        <!-- Textbook status update checkboxes -->
-                                                        <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} onclick="uncheckOther('returned_{{ textbook_info.textbook.id }}')">
-                                                        <label for="collected_{{ textbook_info.textbook.id }}" class="mr-4">Collected</label>
-                                                        
-                                                        <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} onclick="uncheckOther('collected_{{ textbook_info.textbook.id }}')">
-                                                        <label for="returned_{{ textbook_info.textbook.id }}" class="mr-4">Returned</label>
-                                                        
-                                                        <button type="submit" name="statusform" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-2 ml-auto rounded">Update</button>
-                                                    </form>
-                                                </li>
-                                                {% endif %}  
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
+                                    <div id="textbooks_{{ student_data.student.id }}" class="w-full flex flex-col items-center justify-center">
+                                        <table class="w-fit mb-5 border-collapse border text-left border-gray-400 rounded-md">
+                                            <thead class="bg-slate-500 text-white">
+                                                <tr>
+                                                    <th class="px-4 py-2">Book Title</th>
+                                                    <th class="px-4 py-2">Status</th>
+                                                    <th class="px-4 py-2">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-200 text-left">
+                                                {% for textbook_info in student_data.textbooks %}
+                                                    {% if textbook_info.textbook.classname == selected_class %}
+                                                    <tr class="{% cycle 'bg-slate-800' 'bg-slate-900' %} hover:bg-slate-700 transition duration-300 ease-in-out"> 
+                                                        <form method="post" class="flex items-center justify-between p-4">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
+                                                                <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
+                                                                <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
+                                                                <input type="hidden" name="textbook_id" value="{{ textbook_info.textbook.id }}">
+
+                                                                <td class="px-4 py-2">{{ textbook_info.textbook.book_title }}</td>
+                                                                <td class="px-4 py-2">
+                                                                    <div class="flex items-center space-x-2">
+                                                                        <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} onclick="uncheckOther('returned_{{ textbook_info.textbook.id }}')" class="form-checkbox h-4 w-4 text-indigo-600">
+                                                                        <label for="collected_{{ textbook_info.textbook.id }}" class="text-sm font-medium">Collected</label>
+                                                                        
+                                                                        <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} onclick="uncheckOther('collected_{{ textbook_info.textbook.id }}')" class="form-checkbox h-4 w-4 text-indigo-600">
+                                                                        <label for="returned_{{ textbook_info.textbook.id }}" class="text-sm font-medium">Returned</label>
+                                                                    </div>
+                                                                </td>
+                                                                
+                                                                <td class="px-4 py-2">
+                                                                    <button type="submit" name="statusform" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Update</button>
+                                                                </td>
+                                                            </form>
+                                                        </tr>
+                                                    {% endif %}  
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>                                    
                                 </div>
                             {% endif %}      
                         {% endfor %}

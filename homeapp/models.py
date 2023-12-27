@@ -77,7 +77,7 @@ class ClassName(models.Model):
     def __str__(self):
         return self.classname
     
-class Textbooks(models.Model):
+class Textbook(models.Model):
     book_title = models.CharField(max_length=250)
     book_id = models.CharField(max_length=250, default=generate_unique_id, unique=True)
     classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
@@ -87,7 +87,7 @@ class Textbooks(models.Model):
     def __str__(self):
         return self.book_title
 
-class Students(models.Model):
+class Student(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
     student_id = models.CharField(max_length=250, default=generate_unique_id, unique=True)
     classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
@@ -99,14 +99,14 @@ class Students(models.Model):
         ('MEGA', 'MEGA'),
     ]
     section = models.CharField(max_length=250, blank=True, null=True, choices=SECTION_CHOICES)
-    textbooks = models.ManyToManyField(Textbooks, blank=True)
+    textbooks = models.ManyToManyField(Textbook, blank=True)
 
     def __str__(self):
         return f"{self.username.fullname}-{self.username} - {self.student_id} - {self.classname}"
     
 class TextbookStatus(models.Model):
-    student = models.ForeignKey(Students, on_delete=models.CASCADE)
-    textbook = models.ForeignKey(Textbooks, on_delete=models.CASCADE)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    textbook = models.ForeignKey(Textbook, on_delete=models.CASCADE)
     collected = models.BooleanField(default=False)
     returned = models.BooleanField(default=False)
 
@@ -134,17 +134,17 @@ def update_available_quantity(sender, instance, **kwargs):
 def create_or_update_student_profile(sender, instance, created, **kwargs):
     if instance.is_student:
         if created:
-            student_profile = Students.objects.create(username=instance)
+            student_profile = Student.objects.create(username=instance)
         else:
-            student_profile, _ = Students.objects.get_or_create(username=instance)
+            student_profile, _ = Student.objects.get_or_create(username=instance)
         
         # Update student profile with all textbooks
-        all_textbooks = Textbooks.objects.all()
+        all_textbooks = Textbook.objects.all()
         student_profile.textbooks.add(*all_textbooks)
     else:
-        Students.objects.filter(username=instance).delete()
+        Student.objects.filter(username=instance).delete()
 
 @receiver(post_save, sender=User)
 def delete_student_profile(sender, instance, **kwargs):
     if not instance.is_student:
-        Students.objects.filter(username=instance).delete()
+        Student.objects.filter(username=instance).delete()
