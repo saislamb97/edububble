@@ -4,32 +4,34 @@
 
 <div class="container mx-auto text-white font-sans"> 
     <!-- Student Details Section -->
-    <div class="text-center rounded-lg shadow-lg">
-        <table class="w-full p-6">
-            <h1 class="text-3xl text-left text-white font-bold py-2 mb-5 border-b-4 border-white">
-                <span class="align-middle ml-2 block">My Information</span>
-            </h1>
-            <thead class="bg-slate-800 text-white">
-                <tr>
-                    <th class="px-4 py-3">Full Name</th>
-                    <th class="px-4 py-3">IC Number</th>
-                    <th class="px-4 py-3">Enrolled Class</th>
-                    <th class="px-4 py-3">Enrolled Section</th>
-                </tr>
-            </thead>
-            <tbody class="bg-slate-500">
-                {% if student %}
-                    <tr class="hover:bg-slate-700"> 
-                        <td class="px-4 py-3">{{ student.username.fullname }}</td>
-                        <td class="px-4 py-3">{{ student.student_id }}</td>
-                        <td class="px-4 py-3">{{ student.classname }}</td>
-                        <td class="px-4 py-3">{{ student.section }}</td>
+    <div class="bg-white rounded-lg shadow-lg">
+        <div class="bg-gray-800 text-white px-6 py-4">
+            <h1 class="text-3xl font-bold">My Information</h1>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-200 text-gray-700 uppercase text-xs font-semibold">
+                    <tr>
+                        <th class="px-6 py-3 text-left">Full Name</th>
+                        <th class="px-6 py-3 text-left">IC Number</th>
+                        <th class="px-6 py-3 text-left">Enrolled Class</th>
+                        <th class="px-6 py-3 text-left">Enrolled Section</th>
                     </tr>
-                {% endif %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="text-gray-700">
+                    {% if student %}
+                        <tr class="hover:bg-gray-100 transition-colors">
+                            <td class="px-6 py-4">{{ student.username.fullname }}</td>
+                            <td class="px-6 py-4">{{ student.student_id }}</td>
+                            <td class="px-6 py-4">{{ student.classname }}</td>
+                            <td class="px-6 py-4">{{ student.section }}</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
-  
+    
     <!-- Display buttons for each class -->
     <form method="post" class="flex justify-between items-center mt-5">
         {% csrf_token %}

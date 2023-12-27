@@ -22,7 +22,7 @@
 <div class="container p-10 pt-20 bg-slate-900 min-h-screen text-white rounded-md flex flex-col items-center justify-center font-sans">
     {% if textbooks_by_class %}
         {% for class_name, textbooks in textbooks_by_class.items %}
-            <div class="mb-auto w-1/2 flex flex-col items-center justify-center border-b-4 border-white">
+            <div class="mb-auto w-1/2 flex flex-col items-center justify-center">
                 <button class="w-full focus:outline-none text-left text-3xl text-white font-bold p-2 mb-3 border-b-4 border-white hover:border-transparent bg-slate-500 hover:bg-slate-800 transition duration-300 ease-in-out" onclick="toggleTable('{{ class_name }}')">{{ class_name }}</button>
                 <table id="{{ class_name }}" class="hidden w-fit mb-5 border-collapse border border-gray-400 rounded-md">
                     <!-- Table headers -->

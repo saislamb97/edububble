@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, TextbookStatusForm, UserForm
 from .decorators import admin_required, student_required, staff_required
 from django.contrib import messages
-from .models import ClassName, TextbookStatus, Students, Textbooks, update_available_quantity
+from .models import ClassName, TextbookStatus, Student, Textbook, update_available_quantity
 from django.db.models import Count
 import plotly.express as px
 
@@ -36,13 +36,13 @@ def StudentIndexView(request):
 
     # Query the Students model using the logged-in user
     try:
-        student = Students.objects.get(username=user)
-    except Students.DoesNotExist:
+        student = Student.objects.get(username=user)
+    except Student.DoesNotExist:
         # Handle case where the student doesn't exist for the logged-in user
         print("Student information not found.")
 
     # Retrieve student profile or return 404 if it doesn't exist
-    student_profile = get_object_or_404(Students, username=user)
+    student_profile = get_object_or_404(Student, username=user)
     user_textbooks = student_profile.textbooks.all()
     textbooks_with_status = []
 
@@ -51,7 +51,7 @@ def StudentIndexView(request):
         selected_class = get_object_or_404(ClassName, id=request.POST.get('class_id'))
 
         # Filter textbooks based on the selected class without modifying user_textbooks
-        textbooks_for_class = Textbooks.objects.filter(classname=selected_class)
+        textbooks_for_class = Textbook.objects.filter(classname=selected_class)
 
         for textbook in user_textbooks:
             if textbook in textbooks_for_class:  # Check if the textbook belongs to the selected class
@@ -101,7 +101,7 @@ def StaffIndexView(request):
                 selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
                 section_name = request.POST.get('selected_section_id')
                 student_id = request.POST.get('student_id')
-                selected_student = get_object_or_404(Students, id=student_id)
+                selected_student = get_object_or_404(Student, id=student_id)
                 class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
 
         elif 'section_student_form' in request.POST:
@@ -109,7 +109,7 @@ def StaffIndexView(request):
             selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
             section_name = request.POST.get('selected_section_id')
             student_id = request.POST.get('student_id')
-            selected_student = get_object_or_404(Students, id=student_id)
+            selected_student = get_object_or_404(Student, id=student_id)
             class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
             
         elif 'class_section_form' in request.POST:
@@ -140,7 +140,7 @@ def StaffIndexView(request):
 @staff_required
 def AllTextbookView(request):
     textbooks_by_class = {}
-    all_textbooks = Textbooks.objects.all()
+    all_textbooks = Textbook.objects.all()
     textbooks_by_class = {}
 
     # Group textbooks by classname
@@ -156,7 +156,7 @@ def AllTextbookView(request):
     return render(request, 'alltextbook.html', {'textbooks_by_class': textbooks_by_class})
 
 def generate_textbook_status_chart(class_name, user):
-    class_textbooks = Textbooks.objects.filter(classname=class_name)
+    class_textbooks = Textbook.objects.filter(classname=class_name)
 
     collected_count = TextbookStatus.objects.filter(textbook__in=class_textbooks, student__username=user, collected=True).count()
     returned_count = TextbookStatus.objects.filter(textbook__in=class_textbooks, student__username=user, returned=True).count()
@@ -179,10 +179,10 @@ def generate_textbook_status_chart(class_name, user):
 
 def generate_textbook_status_chart_for_class(class_name):
     # Retrieve all students in the specified class
-    students_in_class = Students.objects.filter(classname=class_name)
+    students_in_class = Student.objects.filter(classname=class_name)
 
     # Retrieve textbooks for all students in the class
-    textbooks_for_class_students = Textbooks.objects.filter(students__in=students_in_class).distinct()
+    textbooks_for_class_students = Textbook.objects.filter(student__in=students_in_class).distinct()
 
     # Calculate counts for textbook statuses
     collected_count = TextbookStatus.objects.filter(textbook__in=textbooks_for_class_students, collected=True).count()
@@ -209,10 +209,10 @@ def generate_textbook_status_chart_for_class(class_name):
 
 def retrieve_students_by_class_and_section(selected_class, section_name):
     # Retrieve students that match the given class ID and section name
-    students = Students.objects.filter(classname=selected_class, section=section_name)
+    students = Student.objects.filter(classname=selected_class, section=section_name)
     class_students_textbooks = []
 
-    sections = Students.objects.filter(classname=selected_class).values_list('section', flat=True).distinct()
+    sections = Student.objects.filter(classname=selected_class).values_list('section', flat=True).distinct()
 
     for section in sections:
         section_students = students.filter(section=section)
@@ -244,10 +244,10 @@ def retrieve_students_by_class_and_section(selected_class, section_name):
 
 def retrieve_class_data(selected_class):
     class_students_textbooks = []
-    sections = Students.objects.filter(classname=selected_class).values_list('section', flat=True).distinct()
+    sections = Student.objects.filter(classname=selected_class).values_list('section', flat=True).distinct()
 
     for section in sections:
-        students = Students.objects.filter(classname=selected_class, section=section)
+        students = Student.objects.filter(classname=selected_class, section=section)
         class_students = []
 
         for student in students:
@@ -281,8 +281,8 @@ def update_textbook_status(request):
     collected = request.POST.get('collected')
     returned = request.POST.get('returned')
 
-    student = get_object_or_404(Students, id=student_id)
-    textbook = get_object_or_404(Textbooks, id=textbook_id)
+    student = get_object_or_404(Student, id=student_id)
+    textbook = get_object_or_404(Textbook, id=textbook_id)
     textbook_status = get_object_or_404(TextbookStatus, student=student, textbook=textbook)
 
     # Update status based on checkbox selections

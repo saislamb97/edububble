@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import User, ClassName, Textbooks, Students, TextbookStatus
+from .models import User, ClassName, Textbook, Student, TextbookStatus
 from django.contrib.auth.admin import UserAdmin
 
 class UserAdminConfig(UserAdmin):
@@ -25,7 +25,7 @@ class ClassNameConfig(admin.ModelAdmin):
     list_filter = ['classname', 'description']
 
 class TextbooksConfig(admin.ModelAdmin):
-    model = Textbooks
+    model = Textbook
     search_fields = ['book_title', 'classname__classname']
     list_display = ['book_title', 'book_id', 'classname', 'quantity_total', 'available_quantity']
     list_filter = ['classname']
@@ -62,7 +62,7 @@ class TextbooksConfig(admin.ModelAdmin):
     ]
 
 class StudentConfig(admin.ModelAdmin):
-    model = Students
+    model = Student
     list_display = ['username', 'get_full_name', 'student_id', 'classname', 'section']
 
     def get_full_name(self, obj):
@@ -120,6 +120,6 @@ admin.site.index_title = 'Admin Dashboard'
 
 admin.site.register(User, UserAdminConfig)
 admin.site.register(ClassName,ClassNameConfig)
-admin.site.register(Textbooks, TextbooksConfig)
-admin.site.register(Students,StudentConfig)
+admin.site.register(Textbook, TextbooksConfig)
+admin.site.register(Student,StudentConfig)
 admin.site.register(TextbookStatus,TextbookStatusConfig)
