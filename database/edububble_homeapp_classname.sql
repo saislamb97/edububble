@@ -28,7 +28,7 @@ CREATE TABLE `homeapp_classname` (
   `description` longtext NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `homeapp_classname_classname_72561d87_uniq` (`classname`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,6 +37,7 @@ CREATE TABLE `homeapp_classname` (
 
 LOCK TABLES `homeapp_classname` WRITE;
 /*!40000 ALTER TABLE `homeapp_classname` DISABLE KEYS */;
+INSERT INTO `homeapp_classname` VALUES (21,'Form1',''),(22,'Form2',''),(23,'Form3',''),(24,'Form4',''),(25,'Form5',''),(26,'Graduate','');
 /*!40000 ALTER TABLE `homeapp_classname` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -49,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-12-27 23:54:45
+-- Dump completed on 2024-01-02 11:46:36

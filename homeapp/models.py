@@ -81,8 +81,8 @@ class Textbook(models.Model):
     book_title = models.CharField(max_length=250)
     book_id = models.CharField(max_length=250, default=generate_unique_id, unique=True)
     classname = models.ForeignKey(ClassName, on_delete=models.SET_NULL, null=True)
-    quantity_total = models.IntegerField(null=True, blank=True)
-    available_quantity = models.IntegerField(null=True, blank=True)
+    quantity_total = models.IntegerField(null=True, blank=True, default=100)
+    available_quantity = models.IntegerField(null=True, blank=True, default=100)
     
     def __str__(self):
         return self.book_title
