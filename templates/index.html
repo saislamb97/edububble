@@ -1,59 +1,194 @@
 {% extends 'base.html' %}
-{% block title %}Home{% endblock %}
+{% block title %}home{% endblock %}
 {% block content %}
 
 {% if messages %}
-        <div class="bg-cyan-950 p-2 text-center text-white">
-            <ul>
-                {% for message in messages %}
-                <li class="font-bold">{{ message }}</li>
-                {% endfor %}
-            </ul>
-        </div>
+    <div class="bg-cyan-950 p-2 text-center text-white font-sans">
+        <ul>
+            {% for message in messages %}
+                <li class="text-base font-bold">{{ message }}</li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endif %}
 
-<div class="container mx-auto p-10 bg-cyan-950 min-h-screen text-white flex justify-center items-center rounded-md">
-    
-    <div class="max-w-4xl w-full bg-white rounded-lg shadow-md p-8">
-        <!-- User Details Section -->
-        <div class="bg-white rounded-lg shadow-lg">
-            <div class="bg-cyan-950 text-white px-6 py-4 flex flex-col items-start justify-center">
-                <h1 class="text-xl font-bold text-center">My Information</h1>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-white">
-                    <thead class="bg-gray-200 text-black uppercase text-xs font-semibold">
-                        {% comment %} <tr>
-                            <th class="px-6 py-3 text-left">Full Name</th>
-                            <th class="px-6 py-3 text-left">Username</th>
-                            <th class="px-6 py-3 text-left">Email</th>
-                            <th class="px-6 py-3 text-left">Role</th>
-                        </tr> {% endcomment %}
-                    </thead>
-                    <tbody class="text-gray-800">
-                        {% if request.user.is_staff and request.user.is_superuser  %}
-                            <tr class="transition-colors">
-                                <td class="px-6 py-4">Full Name: <b>{{ user.fullname }}<b></td>
-                                <td class="px-6 py-4">Username: <b>{{ user.username }}<b></td>
-                                <td class="px-6 py-4">Email: <b>{{ user.email }}<b></td>
-                                <td class="px-6 py-4">Role: <b>Admin<b></td>
-                            </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
+<div class="container mx-auto text-white font-sans">
+    <!-- User Details Section -->
+    <div class="bg-white rounded-lg shadow-lg">
+        <div class="bg-cyan-950 text-white px-6 py-4 flex flex-col items-start justify-center">
+            <h1 class="text-xl font-bold text-center">My Information</h1>
         </div>
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-cyan-800">Welcome, <span class="font-bold">{{ user }}</span>!</h1>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <a href="{% url 'admin:index' %}" class="col-span-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-6 rounded-md text-center flex justify-center items-center space-x-2">
-                <span class="font-bold">Go to Admin Panel</span>
-                <i class="fa-solid fa-user-tie"></i>
-            </a>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-white">
+                <thead class="bg-gray-200 text-black uppercase text-xs font-semibold">
+                    {% comment %} <tr>
+                        <th class="px-6 py-3 text-left">Full Name</th>
+                        <th class="px-6 py-3 text-left">Username</th>
+                        <th class="px-6 py-3 text-left">Email</th>
+                        <th class="px-6 py-3 text-left">Role</th>
+                    </tr> {% endcomment %}
+                </thead>
+                <tbody class="text-gray-800">
+                    {% if request.user.is_staff%}
+                        <tr class="transition-colors">
+                            <td class="px-6 py-4">Full Name: <b>{{ user.fullname }}<b></td>
+                            <td class="px-6 py-4">Username: <b>{{ user.username }}<b></td>
+                            <td class="px-6 py-4">Email: <b>{{ user.email }}<b></td>
+                            <td class="px-6 py-4">Role: <b>Staff<b></td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
         </div>
     </div>
+
+    <!-- Display buttons for each class -->
+    <form method="post" class="flex justify-between items-center">
+        {% csrf_token %}
+        {% for class_data in all_classes %}
+            <button type="submit" name="class_id" value="{{ class_data.id }}" class="w-full bg-cyan-950 hover:bg-cyan-800 text-white hover:font-bold font-semibold p-4 rounded m-2">
+                Class: {{ class_data.classname }}
+            </button>
+        {% endfor %}
+    </form>
 </div>
+
+<!-- Bottom Section for Forms and Content -->
+<div class="container mx-auto p-10 min-h-full text-white rounded-xl flex font-sans">
+
+    {% if selected_class %}
+        <!-- Left Section: all sections and students -->
+        <div class="w-2/6 flex flex-col items-center">
+            <!-- Top Section: Display all sections -->
+                <div class="border p-4 mb-4 rounded-lg w-full bg-cyan-950">
+                    <h2 class="text-2xl font-bold bg- text-white text-center p-2 rounded">All Sections of {{selected_class}}</h2>
+                    <form method="post" class="flex items-center space-x-4">
+                        {% csrf_token %}
+                        <select name="section_name" class="w-full bg-[white] hover:bg-gray-300 hover:font-bold text-[black] rounded border p-2">
+                            <option value="" selected disabled>Select Section</option>
+                            {% for class_data in class_students_textbooks %}
+                                <option value="{{ class_data.section }}">{{ class_data.section }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="class_section_id" value="{{ selected_class.id }}">
+                        <button type="submit" name="class_section_form" class="w-full bg-[white] hover:bg-gray-200 hover:font-bold text-[black] font-semibold py-2 px-4 rounded">Filter Students</button>
+                    </form>
+                </div>
+    
+            <!-- Bottom Section: Display all students -->
+            {% if selected_section %}
+                <div class="border p-4 mb-4 rounded-lg w-full  bg-cyan-950">
+                    <h2 class="text-2xl font-bold text-white text-center p-2 rounded">All Students of {{selected_section}} in {{selected_class}}</h2>
+                    {% for class_data in class_students_textbooks %}
+                        {% for student_data in class_data.class_students %}
+                            <form method="post" class="space-y-5">
+                                {% csrf_token %}
+                                <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
+                                <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
+                                <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
+                                <button type="submit" name="section_student_form" class="bg-white text-black hover:bg-gray-200 hover:font-bold font-semibold py-2 px-4 rounded-xl">
+                                    {% if student_data.student.username.fullname %}
+                                        {{ student_data.student.username.fullname }}
+                                    {% else %}
+                                        {{ student_data.student.username.username }}
+                                    {% endif %}
+                                </button>                                
+                            </form>
+                        {% endfor %}
+                    {% endfor %} 
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Section: Display Books with status -->
+        <div class="w-4/6 ml-20 flex flex-col items-center font-sans">
+            {% if selected_student %}
+                {% for class_data in class_students_textbooks %}
+                        {% for student_data in class_data.class_students %}
+                            {% if student_data.student.id == selected_student.id %}
+                                <div class=" border p-4 mb-4 rounded w-full flex flex-col items-center ">
+                                    <h3 class="text-2xl bg-cyan-950 font-bold text-white text-center p-6 m-4 rounded-xl">
+                                        {% if student_data.student.username.fullname %}
+                                            {{ student_data.student.username.fullname }}
+                                        {% else %}
+                                            {{ student_data.student.username.username }}
+                                        {% endif %}
+                                    </h3>
+                                    <div id="textbooks_{{ student_data.student.id }}" class="w-full px-5 flex flex-col items-center justify-center">
+                                        <table class="w-full mb-5 border-collapse border text-left border-gray-400 rounded-md">
+                                            <thead class="bg-cyan-950 text-white">
+                                                <tr>
+                                                    <th class="px-4 py-2">Book Title</th>
+                                                    <th class="px-4 py-2">Status</th>
+                                                    <th class="px-4 py-2">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-200 text-left text-black">
+                                                {% for textbook_info in student_data.textbooks %}
+                                                    {% if textbook_info.textbook.classname == selected_class %}
+                                                    <tr class="{% cycle 'bg-white' 'bg-gray-300' %} {% cycle 'even' 'odd' %} hover:bg-gray-100 hover:font-semibold transition duration-300 ease-in-out"> 
+                                                        <form method="post" class="flex items-center justify-between p-4">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
+                                                                <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
+                                                                <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
+                                                                <input type="hidden" name="textbook_id" value="{{ textbook_info.textbook.id }}">
+
+                                                                <td class="px-4 py-2">{{ textbook_info.textbook.book_title }}</td>
+                                                                <td class="px-4 py-2">
+                                                                    <div class="flex items-center space-x-2">
+                                                                        <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} onclick="uncheckOther('returned_{{ textbook_info.textbook.id }}')" class="form-checkbox h-4 w-4 text-green-600">
+                                                                        <label for="collected_{{ textbook_info.textbook.id }}" class="text-sm font-medium">Collected</label>
+                                                                        
+                                                                        <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} onclick="uncheckOther('collected_{{ textbook_info.textbook.id }}')" class="form-checkbox h-4 w-4 text-indigo-600">
+                                                                        <label for="returned_{{ textbook_info.textbook.id }}" class="text-sm font-medium">Returned</label>
+                                                                    </div>
+                                                                </td>
+                                                                
+                                                                <td class="px-4 py-2">
+                                                                    <button type="submit" name="statusform" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded">Update</button>
+                                                                </td>
+                                                            </form>
+                                                        </tr>
+                                                    {% endif %}  
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>                                    
+                                </div>
+                            {% endif %}      
+                        {% endfor %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% else %}
+        <!-- ... Display charts for all classes ... -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+            {% for chart_data in chart_data_for_classes %}
+                <div class="chart-container w-full text-black p-4 bg-white rounded-md">
+                    <div class="chart-content">
+                        {{ chart_data.chart_div | safe }}
+                    </div>
+                    <div class="text-center mt-3">
+                        <p>Returned: {{ chart_data.counts.returned }}</p>
+                        <p>Collected: {{ chart_data.counts.collected }}</p>
+                        <p>Not Specified: {{ chart_data.counts.not_specified }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+    <script>
+        function uncheckOther(checkboxId) {
+            const otherCheckbox = document.getElementById(checkboxId);
+            const currentCheckbox = document.activeElement;
+
+            if (currentCheckbox.checked && otherCheckbox.checked) {
+                otherCheckbox.checked = false;
+            }
+        }
+    </script>
 
 {% endblock %}

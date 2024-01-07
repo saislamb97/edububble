@@ -8,6 +8,5 @@ urlpatterns = [
     path('login/', views.LoginView, name='login'),
     path('logout/', views.LogoutView, name='logout'),
     path('student/', views.StudentIndexView, name='student_index'),
-    path('staff/', views.StaffIndexView, name='staff_index'),
-    path('staff/alltextbook', views.AllTextbookView, name='alltextbook'),
+    path('alltextbook', views.AllTextbookView, name='alltextbook'),
 ]

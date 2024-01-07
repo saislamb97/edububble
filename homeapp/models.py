@@ -122,6 +122,10 @@ class TextbookStatus(models.Model):
             raise ValidationError("Only one status can be selected.")
         super().save(*args, **kwargs)
 
+    class Meta:
+        verbose_name = "Textbook Status"
+        verbose_name_plural = "Textbook Statuses"
+
 @receiver(post_save, sender=TextbookStatus)
 def update_available_quantity(sender, instance, **kwargs):
     if instance.textbook.quantity_total is not None and instance.textbook.available_quantity is not None:

@@ -12,11 +12,17 @@
     </div>
 {% endif %}
 
-<div class="container pt-5 min-w-full min-h-full text-white rounded-xl flex flex-col items-start justify-center font-sans ">
+<div class="container pt-5 min-w-full min-h-full text-white rounded-xl flex flex-col items-start justify-center font-sans px-20">
     {% if textbooks_by_class %}
         {% for class_name, textbooks in textbooks_by_class.items %}
             <div class="mb-auto w-full">
-                <button class="w-full focus:outline-none text-2xl text-center text-white font-bold p-2 mb-3 hover:border-transparent bg-cyan-950 hover:bg-cyan-800 transition duration-300 ease-in-out" onclick="toggleTable('{{ class_name }}')">{{ class_name }}</button>
+                <div class="flex items-center justify-between mb-4 border-b-2 border-transparent bg-cyan-800 cursor-pointer rounded-md p-3" onclick="toggleTable('{{ class_name }}')">
+                    <span class="text-white font-semibold text-lg">{{ class_name }}</span>
+                    <svg class="w-6 h-6 text-gray-100 transform transition-transform" id="toggle-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                        <path fill="currentColor" d="M10 18a.997.997 0 01-.707-.293l-8-8a.999.999 0 111.414-1.414L10 15.586l6.293-6.293a.999.999 0 111.414 1.414l-7.999 8A.997.997 0 0110 18z"/>
+                    </svg>
+                </div>                
+
                 <table id="{{ class_name }}" class="hidden w-full mb-5 border-collapse border border-gray-400 rounded-md">
                     <!-- Table headers -->
                     <thead class="bg-cyan-950 text-white">
