@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, TextbookStatusForm
-from .decorators import admin_required, student_required, staff_required
+from .decorators import student_required, staff_required
 from django.contrib import messages
 from .models import ClassName, TextbookStatus, Student, Textbook, update_available_quantity
 from django.db.models import Count
@@ -12,12 +12,64 @@ import plotly.express as px
 
 # User Index Views
 @login_required(login_url='homeapp:login')
-@admin_required
+@staff_required
 def IndexView(request):
     user = request.user
 
+    textbookstatusform = TextbookStatusForm()
+    classes = ClassName.objects.all()
+    class_students_textbooks = []
+    selected_class = None
+    selected_student = None
+    section_name = None
+
+    chart_data_for_classes = []
+    for class_obj in classes:
+        chart_data = generate_textbook_status_chart_for_class(class_obj)
+        chart_data_for_classes.append(chart_data)
+
+    if request.method == 'POST':
+        if 'statusform' in request.POST:
+            textbookstatusform = TextbookStatusForm(request.POST)
+            if textbookstatusform.is_valid():
+                # Update textbook status
+                update_textbook_status(request)
+                # Retrieve and display data for the selected class_id after update
+                selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
+                section_name = request.POST.get('selected_section_id')
+                student_id = request.POST.get('student_id')
+                selected_student = get_object_or_404(Student, id=student_id)
+                class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
+
+        elif 'section_student_form' in request.POST:
+            # Form submission to filter students by class ID and section name
+            selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
+            section_name = request.POST.get('selected_section_id')
+            student_id = request.POST.get('student_id')
+            selected_student = get_object_or_404(Student, id=student_id)
+            class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
+            
+        elif 'class_section_form' in request.POST:
+            # Form submission to filter students by class ID and section name
+            class_section_id = request.POST.get('class_section_id')
+            section_name = request.POST.get('section_name')
+            selected_class = get_object_or_404(ClassName, id=class_section_id)
+            class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
+
+        elif 'class_id' in request.POST:
+            # Retrieve and display data for the selected class_id
+            selected_class = get_object_or_404(ClassName, id=request.POST.get('class_id'))
+            class_students_textbooks = retrieve_class_data(selected_class)
+
     context = {
         'user': user,
+        'class_students_textbooks': class_students_textbooks,
+        'textbookstatusform': textbookstatusform,
+        'selected_class': selected_class,
+        'selected_student':selected_student,
+        'selected_section': section_name,
+        'all_classes': classes,
+        'chart_data_for_classes': chart_data_for_classes,
     }
 
     return render(request, 'index.html', context)
@@ -75,66 +127,6 @@ def StudentIndexView(request):
         'chart_data_for_classes': chart_data_for_classes,
     }
     return render(request, 'student_index.html', context)
-
-@login_required(login_url='homeapp:login')
-@staff_required
-def StaffIndexView(request):
-    textbookstatusform = TextbookStatusForm()
-    classes = ClassName.objects.all()
-    class_students_textbooks = []
-    selected_class = None
-    selected_student = None
-    section_name = None
-
-    chart_data_for_classes = []
-    for class_obj in classes:
-        chart_data = generate_textbook_status_chart_for_class(class_obj)
-        chart_data_for_classes.append(chart_data)
-
-    if request.method == 'POST':
-        if 'statusform' in request.POST:
-            textbookstatusform = TextbookStatusForm(request.POST)
-            if textbookstatusform.is_valid():
-                # Update textbook status
-                update_textbook_status(request)
-                # Retrieve and display data for the selected class_id after update
-                selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
-                section_name = request.POST.get('selected_section_id')
-                student_id = request.POST.get('student_id')
-                selected_student = get_object_or_404(Student, id=student_id)
-                class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
-
-        elif 'section_student_form' in request.POST:
-            # Form submission to filter students by class ID and section name
-            selected_class = get_object_or_404(ClassName, id=request.POST.get('selected_class_id'))
-            section_name = request.POST.get('selected_section_id')
-            student_id = request.POST.get('student_id')
-            selected_student = get_object_or_404(Student, id=student_id)
-            class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
-            
-        elif 'class_section_form' in request.POST:
-            # Form submission to filter students by class ID and section name
-            class_section_id = request.POST.get('class_section_id')
-            section_name = request.POST.get('section_name')
-            selected_class = get_object_or_404(ClassName, id=class_section_id)
-            class_students_textbooks = retrieve_students_by_class_and_section(selected_class, section_name)
-
-        elif 'class_id' in request.POST:
-            # Retrieve and display data for the selected class_id
-            selected_class = get_object_or_404(ClassName, id=request.POST.get('class_id'))
-            class_students_textbooks = retrieve_class_data(selected_class)
-
-    context = {
-        'class_students_textbooks': class_students_textbooks,
-        'textbookstatusform': textbookstatusform,
-        'selected_class': selected_class,
-        'selected_student':selected_student,
-        'selected_section': section_name,
-        'all_classes': classes,
-        'chart_data_for_classes': chart_data_for_classes,
-    }
-
-    return render(request, 'staff_index.html', context)
 
 @login_required(login_url='homeapp:login')
 @staff_required
@@ -297,12 +289,8 @@ def update_textbook_status(request):
 
 def LoginView(request):
     if request.user.is_authenticated:
-        if request.user.is_superuser:
-            return redirect('homeapp:index')
-        elif request.user.is_student:
+        if request.user.is_student:
             return redirect('homeapp:student_index')
-        elif request.user.is_staff:
-            return redirect('homeapp:staff_index')
         else:
             return redirect('homeapp:index')
 
@@ -311,12 +299,8 @@ def LoginView(request):
         if loginform.is_valid():
             user = loginform.get_user()
             login(request, user)
-            if user.is_superuser:
-                return redirect('homeapp:index')
-            elif user.is_student:
+            if user.is_student:
                 return redirect('homeapp:student_index')
-            elif user.is_staff:
-                return redirect('homeapp:staff_index')
             else:
                 return redirect('homeapp:index')
     else:

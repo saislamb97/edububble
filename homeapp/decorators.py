@@ -10,15 +10,6 @@ def redirect_authenticated_user(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
-def admin_required(view_func):
-    @wraps(view_func)
-    def wrapper(request, *args, **kwargs):
-        if request.user.is_authenticated and request.user.is_superuser:
-            return view_func(request, *args, **kwargs)
-        else:
-            return redirect("homeapp:login")
-    return wrapper
-
 def student_required(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
