@@ -50,11 +50,11 @@ class TextbooksConfig(admin.ModelAdmin):
         selected_class = ClassName.objects.get(classname=class_name)
         queryset.update(classname=selected_class)
 
-    update_to_form1_class.short_description = "Update selected students to Form1 class"
-    update_to_form2_class.short_description = "Update selected students to Form2 class"
-    update_to_form3_class.short_description = "Update selected students to Form3 class"
-    update_to_form4_class.short_description = "Update selected students to Form4 class"
-    update_to_form5_class.short_description = "Update selected students to Form5 class"
+    update_to_form1_class.short_description = "Update selected textbooks to Form1 class"
+    update_to_form2_class.short_description = "Update selected textbooks to Form2 class"
+    update_to_form3_class.short_description = "Update selected textbooks to Form3 class"
+    update_to_form4_class.short_description = "Update selected textbooks to Form4 class"
+    update_to_form5_class.short_description = "Update selected textbooks to Form5 class"
 
     actions = [
         'update_to_form1_class', 'update_to_form2_class', 'update_to_form3_class',
