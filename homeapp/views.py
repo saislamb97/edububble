@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login,logout
 from django.contrib.auth.decorators import login_required
-from .forms import LoginForm, TextbookStatusForm, UserForm
+from .forms import LoginForm, TextbookStatusForm
 from .decorators import admin_required, student_required, staff_required
 from django.contrib import messages
 from .models import ClassName, TextbookStatus, Student, Textbook, update_available_quantity
@@ -294,25 +294,6 @@ def update_textbook_status(request):
     update_available_quantity(sender=TextbookStatus, instance=textbook_status)
 
     messages.success(request, 'Textbook status updated.')
-
-# User Profile and Login Views
-@login_required(login_url='homeapp:login')
-def UserProfileView(request):
-    user = request.user
-    userform = UserForm(instance=user)
-
-    if request.method == 'POST':
-        userform = UserForm(request.POST, instance=user)
-        if userform.is_valid():
-            userform.save()
-            messages.success(request, 'Your information was successfully updated.')
-            return redirect('homeapp:userprofile')
-
-    context = {
-        'userform': userform,
-    }
-
-    return render(request, 'userprofile.html', context)
 
 def LoginView(request):
     if request.user.is_authenticated:

@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if messages %}
-    <div class="bg-emerald-600 p-2 text-center text-white font-sans">
+    <div class="bg-cyan-950 p-2 text-center text-white font-sans">
         <ul>
             {% for message in messages %}
                 <li class="text-base font-bold">{{ message }}</li>
@@ -12,39 +12,32 @@
     </div>
 {% endif %}
 
-<div class="container mx-auto p-10 text-white font-sans"> 
-    <!-- Textbook Management Section -->
-    <h1 class="text-3xl text-white font-bold py-2 border-b-4 border-white">
-        <span class="align-middle ml-2 block">Textbooks Management</span>
-    </h1>
-</div>
-
-<div class="container p-10 pt-20 bg-slate-900 min-h-screen text-white rounded-md flex flex-col items-center justify-center font-sans">
+<div class="container pt-5 min-w-full min-h-full text-white rounded-xl flex flex-col items-start justify-center font-sans ">
     {% if textbooks_by_class %}
         {% for class_name, textbooks in textbooks_by_class.items %}
-            <div class="mb-auto w-1/2 flex flex-col items-center justify-center">
-                <button class="w-full focus:outline-none text-left text-3xl text-white font-bold p-2 mb-3 border-b-4 border-white hover:border-transparent bg-slate-500 hover:bg-slate-800 transition duration-300 ease-in-out" onclick="toggleTable('{{ class_name }}')">{{ class_name }}</button>
-                <table id="{{ class_name }}" class="hidden w-fit mb-5 border-collapse border border-gray-400 rounded-md">
+            <div class="mb-auto w-full">
+                <button class="w-full focus:outline-none text-2xl text-center text-white font-bold p-2 mb-3 hover:border-transparent bg-cyan-950 hover:bg-cyan-800 transition duration-300 ease-in-out" onclick="toggleTable('{{ class_name }}')">{{ class_name }}</button>
+                <table id="{{ class_name }}" class="hidden w-full mb-5 border-collapse border border-gray-400 rounded-md">
                     <!-- Table headers -->
-                    <thead class="bg-slate-500 text-white">
+                    <thead class="bg-cyan-950 text-white">
                         <tr>
-                            <th class="px-4 py-2">Serial No.</th>
-                            <th class="px-4 py-2">Book Title</th>
-                            <th class="px-4 py-2">Book ID</th>
-                            <th class="px-4 py-2">Classname</th>
-                            <th class="px-4 py-2">Total Quantity</th>
-                            <th class="px-4 py-2">Available Quantity</th>
+                            <th class="px-4 py-2 text-left">Serial No.</th>
+                            <th class="px-4 py-2 text-left">Book Title</th>
+                            <th class="px-4 py-2 text-center">Book ID</th>
+                            <th class="px-4 py-2 text-center">Classname</th>
+                            <th class="px-4 py-2 text-center">Total Quantity</th>
+                            <th class="px-4 py-2 text-center">Available Quantity</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 text-left">
+                    <tbody class="divide-y divide-gray-200 text-left text-black">
                         {% for textbook in textbooks %}
-                            <tr class="{% cycle 'bg-slate-800' 'bg-slate-900' %} hover:bg-slate-700 transition duration-300 ease-in-out"> 
+                            <tr class="{% cycle 'bg-white' 'bg-gray-300' %} {% cycle 'even' 'odd' %} hover:bg-gray-100 hover:font-semibold transition duration-300 ease-in-out"> 
                                 <td class="px-4 py-2">{{ forloop.counter }}</td>
                                 <td class="px-4 py-2">{{ textbook.book_title }}</td>
-                                <td class="px-4 py-2">{{ textbook.book_id }}</td>
-                                <td class="px-4 py-2">{{ textbook.classname }}</td>
-                                <td class="px-4 py-2">{{ textbook.quantity_total }}</td>
-                                <td class="px-4 py-2">{{ textbook.available_quantity }}</td>
+                                <td class="px-4 py-2 text-center">{{ textbook.book_id }}</td>
+                                <td class="px-4 py-2 text-center">{{ textbook.classname }}</td>
+                                <td class="px-4 py-2 text-center">{{ textbook.quantity_total }}</td>
+                                <td class="px-4 py-2 text-center">{{ textbook.available_quantity }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -54,20 +47,13 @@
     {% else %}
         <p>No textbooks available.</p>
     {% endif %}
-
-    <script>
-        function toggleTable(className) {
-            const table = document.getElementById(className);
-            if (table.classList.contains('hidden')) {
-                table.classList.remove('hidden');
-                table.classList.add('block');
-            } else {
-                table.classList.add('hidden');
-                table.classList.remove('block');
-            }
-        }
-    </script>
 </div>
 
-
+<script>
+    function toggleTable(className) {
+        const table = document.getElementById(className);
+        table.classList.toggle('hidden');
+    }
+</script>
+</div>
 {% endblock %}
