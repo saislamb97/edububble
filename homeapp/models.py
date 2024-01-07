@@ -58,8 +58,15 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
     def save(self, *args, **kwargs):
+        if not self.email:
+            self.email = f"{self.username}@example.com"
+
+        if not self.fullname:
+            self.fullname = self.username
+
         if sum([self.is_student, self.is_staff]) > 1:
             raise ValidationError("A user cannot have multiple roles simultaneously.")
+
         super().save(*args, **kwargs)
 
 class ClassName(models.Model):

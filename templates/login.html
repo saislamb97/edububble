@@ -12,25 +12,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gradient-to-t from-gray-400 to-gray-500 no-scrollbar overflow-y-auto min-h-screen">
-    <header class="bg-slate-900 py-5">
+<body class="bg-[#87ACA3] no-scrollbar overflow-y-auto min-h-screen">
+    <header class="bg-cyan-950 py-5">
         <a href="{% url 'homeapp:index' %}">
             <img src="{% static 'images/school_logo.png' %}" alt="logo" class="mx-auto h-40">
         </a>
     </header>
 
-    <div class="container max-w-md mx-auto p-10 my-5 bg-slate-900 text-white rounded-md">
+    <div class="container max-w-md mx-auto p-10 my-5 bg-cyan-950 text-white rounded-2xl">
         <div class="flex flex-col justify-center items-center mb-10">
             <h1 class="text-2xl font-bold text-white text-center">SMK ORKID DESA</h1>
             <h1 class="text-base font-bold text-white text-center">Student Management System</h1>
         </div>
-        <div class="mx-auto bg-gray-500 text-black font-semibold rounded-xl p-6">
+        <div class="mx-auto bg-[#87ACA3] text-black font-semibold rounded-xl p-6">
             <form method="post">
                 {% csrf_token %}
                 {{ loginform.as_p|safe }}
-                <button id="login" type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-4 mt-4 rounded">Log In</button>
+                <button id="login" type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold p-4 mt-4 rounded">Log In</button>
             </form>
-            <a href="{% url 'password_reset' %}" class="block mt-4 text-center text-white hover:text-black">Forgot password? Click here.</a>
+            <a href="{% url 'password_reset' %}" class="block mt-4 text-center text-black hover:text-[white]">Forgot password? Click here.</a>
         </div>
     </div>
 </body>

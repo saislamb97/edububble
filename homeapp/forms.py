@@ -16,22 +16,6 @@ class LoginForm(AuthenticationForm):
         model = User
         fields = ['username', 'password']
 
-class UserForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['email', 'username', 'fullname']
-
-        widgets = {
-            'email': forms.EmailInput(attrs={'class': 'border p-2 mb-4 rounded w-full'}),
-            'username': forms.TextInput(attrs={'class': 'border p-2 mb-4 rounded w-full'}),
-            'fullname': forms.TextInput(attrs={'class': 'border p-2 mb-4 rounded w-full'}),
-        }
-        labels = {
-            'email': 'Email',
-            'username': 'Username',
-            'fullname': 'Full Name',
-        }
-
 class TextbookStatusForm(forms.ModelForm):
     class Meta:
         model = TextbookStatus
