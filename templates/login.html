@@ -28,6 +28,7 @@
             <form method="post">
                 {% csrf_token %}
                 {{ loginform.as_p|safe }}
+                <div class="text-center text-sm text-gray-800"> *Student username and password = IC Number</div>
                 <button id="login" type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold p-4 mt-4 rounded">Log In</button>
             </form>
             <a href="{% url 'password_reset' %}" class="block mt-4 text-center text-black hover:text-[white]">Forgot password? Click here.</a>
