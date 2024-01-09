@@ -2,22 +2,22 @@
 {% block title %}Student Home{% endblock %}
 {% block content %}
 
-<div class=" container mx-auto text-white font-sans px-10 py-5"> 
+<div class="container mx-auto text-white font-sans py-2"> 
     <!-- Student Details Section -->
     <div class="bg-white rounded-lg shadow-lg">
-        <div class="bg-cyan-950 text-white px-6 py-4 flex flex-col items-start justify-center">
+        <div class="bg-cyan-950 text-white px-6 py-3 flex flex-col items-start justify-center">
             <h1 class="text-xl font-bold text-center">My Information</h1>
         </div>
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-white">
+            <table class="min-w-full divide-y divide-white py-2">
                 <thead class="bg-gray-200 text-black uppercase text-xs font-semibold">
                     {% comment %} <tr>
                         <th class="px-6 py-3 text-left">Full Name</th>
                         <th class="px-6 py-3 text-left">Username</th>
                         <th class="px-6 py-3 text-left">Email</th>
                         <th class="px-6 py-3 text-left">IC Number</th>
+                        <th class="px-6 py-3 text-left">Year of Studies</th>
                         <th class="px-6 py-3 text-left">Enrolled Class</th>
-                        <th class="px-6 py-3 text-left">Enrolled Section</th>
                     </tr> {% endcomment %}
                 </thead>
                 <tbody class="text-gray-800">
@@ -26,9 +26,9 @@
                             <td class="px-6 py-4">Full Name: <b>{{ student.username.fullname }}<b></td>
                             <td class="px-6 py-4">Username: <b>{{ student.username.username }}<b></td>
                             <td class="px-6 py-4">Email: <b>{{ student.username.email }}<b></td>
-                            <td class="px-6 py-4">IC Number: <b>{{ student.student_id }}<b></td>
-                            <td class="px-6 py-4">Enrolled Class: <b>{{ student.classname }}<b></td>
-                            <td class="px-6 py-4">Enrolled Section: <b>{{ student.section }}<b></td>
+                            <td class="px-6 py-4">IC Number: <b>{{ student.username.username }}<b></td>
+                            <td class="px-6 py-4">Year of Studies : <b>{{ student.classname }}<b></td>
+                            <td class="px-6 py-4">Enrolled Class: <b>{{ student.section }}<b></td>
                         </tr>
                     {% endif %}
                 </tbody>
@@ -38,17 +38,17 @@
     {% comment %} New {% endcomment %}
     <div>
     <!-- Display buttons for each class -->
-    <form method="post" class="flex justify-between items-center mt-5">
+    <form method="post" class="flex justify-between items-center py-5">
         {% csrf_token %}
         {% for class_data in all_classes %}
-            <button type="submit" name="class_id" value="{{ class_data.id }}" class="w-full bg-cyan-950 hover:bg-cyan-800 text-white font-semibold p-4 rounded m-4">
+            <button type="submit" name="class_id" value="{{ class_data.id }}" class="w-full bg-cyan-950 hover:bg-cyan-800 text-white font-semibold p-4 rounded m-2">
                 Class: {{ class_data.classname }}
             </button>
         {% endfor %}
     </form>
 </div>
 
-<div class="container mx-auto p-10 min-h-full text-black rounded-xl flex items-center justify-center">
+<div class="container mx-auto py-5 min-h-full text-black rounded-xl flex items-center justify-center">
     {% if textbooks_with_status %}
         <div class="overflow-x-auto">
             <table class="w-full mb-auto rounded-md">
