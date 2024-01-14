@@ -3,8 +3,10 @@ __pycache__
 *.log
 .env
 .venv
+.myvenv
 env/
 venv/
+myvenv/
 node_modules/
 .vscode/
 .cache/

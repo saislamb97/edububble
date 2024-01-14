@@ -5,6 +5,7 @@
 <div class="container mx-auto text-white font-sans py-2"> 
     <!-- Student Details Section -->
     <div class="bg-white rounded-lg shadow-lg">
+        
         <div class="bg-cyan-950 text-white px-6 py-3 flex flex-col items-start justify-center">
             <h1 class="text-xl font-bold text-center">My Information</h1>
         </div>
@@ -16,19 +17,19 @@
                         <th class="px-6 py-3 text-left">Username</th>
                         <th class="px-6 py-3 text-left">Email</th>
                         <th class="px-6 py-3 text-left">IC Number</th>
-                        <th class="px-6 py-3 text-left">Year of Studies</th>
-                        <th class="px-6 py-3 text-left">Enrolled Class</th>
+                        <th class="px-6 py-3 text-left">Class</th>
+                        <th class="px-6 py-3 text-left">Enrolled Section</th>
                     </tr> {% endcomment %}
                 </thead>
                 <tbody class="text-gray-800">
                     {% if student %}
                         <tr class="transition-colors">
-                            <td class="px-6 py-4">Full Name: <b>{{ student.username.fullname }}<b></td>
-                            <td class="px-6 py-4">Username: <b>{{ student.username.username }}<b></td>
-                            <td class="px-6 py-4">Email: <b>{{ student.username.email }}<b></td>
-                            <td class="px-6 py-4">IC Number: <b>{{ student.username.username }}<b></td>
-                            <td class="px-6 py-4">Year of Studies : <b>{{ student.classname }}<b></td>
-                            <td class="px-6 py-4">Enrolled Class: <b>{{ student.section }}<b></td>
+                            <td class="px-6 py-4">Full Name: <br> <b>{{ student.username.fullname }}<b></td>
+                            <td class="px-6 py-4">Username: <br> <b>{{ student.username.username }}<b></td>
+                            <td class="px-6 py-4">Email: <br> <b>{{ student.username.email }}<b></td>
+                            <td class="px-6 py-4">IC Number: <br> <b>{{ student.username.username }}<b></td>
+                            <td class="px-6 py-4">Class : <br> <b>{{ student.classname }}<b></td>
+                            <td class="px-6 py-4">Enrolled Section: <br> <b>{{ student.section }}<b></td>
                         </tr>
                     {% endif %}
                 </tbody>
@@ -41,16 +42,22 @@
     <form method="post" class="flex justify-between items-center py-5">
         {% csrf_token %}
         {% for class_data in all_classes %}
-            <button type="submit" name="class_id" value="{{ class_data.id }}" class="w-full bg-cyan-950 hover:bg-cyan-800 text-white font-semibold p-4 rounded m-2">
-                Class: {{ class_data.classname }}
-            </button>
+            {% if class_data.classname|lower != "graduate" %}
+                <button type="submit" name="class_id" value="{{ class_data.id }}" class="w-full bg-cyan-950 hover:bg-cyan-800 text-white font-semibold p-4 rounded m-2">
+                    Class: {{ class_data.classname }}
+                </button>
+            {% endif %}
         {% endfor %}
     </form>
 </div>
 
-<div class="container mx-auto py-5 min-h-full text-black rounded-xl flex items-center justify-center">
+<div class="container mx-auto py-2 min-h-full text-black rounded-xl flex items-center justify-center">
+    
     {% if textbooks_with_status %}
         <div class="overflow-x-auto">
+            <a href="{% url 'homeapp:student_report_pdf' student_id=student.student_id class_name=selected_class.classname %}">
+                <i class="fa-solid fa-download text-4xl text-black"></i>
+            </a>
             <table class="w-full mb-auto rounded-md">
                 <thead class="bg-cyan-950 text-white">
                     <tr>
@@ -81,18 +88,35 @@
 
     {% else %}
         <!-- ... Display charts for all classes ... -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full rounded-xl">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
             {% for chart_data in chart_data_for_classes %}
-                <div class="chart-container w-full text-black p-4 bg-white rounded-2xl">
-                    <div class="chart-content">
-                        {{ chart_data.chart_div | safe }}
+                {% if chart_data.counts.class_name|lower != "graduate" %}
+                    <div class="chart-container w-full p-4 bg-white rounded-md shadow-md mb-4">
+                        <div class="flex items-center justify-between">
+                            <div class="text-lg font-semibold text-black">{{ chart_data.counts.class_name }}</div>
+                            <!-- <div class="chart-content">
+                                {{ chart_data.chart_div | safe }}
+                            </div> -->
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                            <div class="bg-blue-500 text-white p-4 rounded-md">
+                                <i class="fas fa-arrow-up text-lg"></i>
+                                <p class="text-sm uppercase font-bold mb-2">Returned</p>
+                                <p class="text-2xl">{{ chart_data.counts.returned }}</p>
+                            </div>
+                            <div class="bg-green-500 text-white p-4 rounded-md">
+                                <i class="fas fa-check-circle text-lg"></i>
+                                <p class="text-sm uppercase font-bold mb-2">Collected</p>
+                                <p class="text-2xl">{{ chart_data.counts.collected }}</p>
+                            </div>
+                            <div class="bg-yellow-500 text-white p-4 rounded-md">
+                                <i class="fas fa-question-circle text-lg"></i>
+                                <p class="text-sm uppercase font-bold mb-2">Not Collected</p>
+                                <p class="text-2xl">{{ chart_data.counts.not_collected }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-center mt-3">
-                        <p>Returned: {{ chart_data.counts.returned }}</p>
-                        <p>Collected: {{ chart_data.counts.collected }}</p>
-                        <p>Not Specified: {{ chart_data.counts.not_specified }}</p>
-                    </div>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}

@@ -43,7 +43,7 @@ class CustomAccountManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=250, unique=True, blank=True)
     username = models.CharField(max_length=250, unique=True)
-    fullname = models.CharField(max_length=250, blank=True)
+    fullname = models.CharField(max_length=250)
     start_date = models.DateTimeField(default=timezone.now)
     is_student = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -92,7 +92,7 @@ class Textbook(models.Model):
     available_quantity = models.IntegerField(null=True, blank=True, default=100)
     
     def __str__(self):
-        return self.book_title
+        return f'{self.book_title} - {self.classname}'
 
 class Student(models.Model):
     username = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -109,7 +109,7 @@ class Student(models.Model):
     textbooks = models.ManyToManyField(Textbook, blank=True)
 
     def __str__(self):
-        return f"{self.username.fullname}-{self.username} - {self.student_id} - {self.classname}"
+        return f"{self.student_id} - {self.username.fullname} - {self.classname}"
     
 class TextbookStatus(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -131,23 +131,32 @@ def update_available_quantity(sender, instance, **kwargs):
     if instance.textbook.quantity_total is not None and instance.textbook.available_quantity is not None:
         # Calculate the total collected and returned for a specific textbook
         total_collected = TextbookStatus.objects.filter(textbook=instance.textbook, collected=True).count()
-        total_returned = TextbookStatus.objects.filter(textbook=instance.textbook, returned=True).count()
-
-        # Calculate the available quantity based on the collected and returned statuses
-        total_available = total_collected - total_returned
 
         # Calculate available quantity, ensuring it doesn't go below zero
-        available_quantity = instance.textbook.quantity_total - total_available
+        available_quantity = instance.textbook.quantity_total - total_collected
         instance.textbook.available_quantity = max(available_quantity, 0)
         instance.textbook.save()
+
+@receiver(post_save, sender=Student)
+def create_or_update_textbook_status(sender, instance, created, **kwargs):
+    if created:
+        # If a new Student is created, create a TextbookStatus for each associated textbook
+        for textbook in instance.textbooks.all():
+            TextbookStatus.objects.create(student=instance, textbook=textbook)
+    else:
+        # If an existing Student is updated, update TextbookStatus for each associated textbook
+        for textbook in instance.textbooks.all():
+            textbook_status, created = TextbookStatus.objects.get_or_create(student=instance, textbook=textbook)
         
 @receiver(post_save, sender=User)
 def create_or_update_student_profile(sender, instance, created, **kwargs):
     if instance.is_student:
         if created:
-            student_profile = Student.objects.create(username=instance)
+            student_profile = Student.objects.create(username=instance, student_id=instance.username)
         else:
             student_profile, _ = Student.objects.get_or_create(username=instance)
+            student_profile.student_id = instance.username
+            student_profile.save()
         
         # Update student profile with all textbooks
         all_textbooks = Textbook.objects.all()

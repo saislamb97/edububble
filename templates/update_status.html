@@ -1,0 +1,42 @@
+<form method="post" class="flex items-center justify-between p-4">
+    {% csrf_token %}
+    <input type="hidden" name="selected_class_id" value="{{ selected_class.id }}">
+    <input type="hidden" name="selected_section_id" value="{{ selected_section }}">
+    <input type="hidden" name="student_id" value="{{ student_data.student.id }}">
+    <input type="hidden" name="textbook_id" value="{{ textbook_info.textbook.id }}">
+
+    <td class="px-4 py-2">{{ textbook_info.textbook.book_title }}</td>
+
+    <td class="px-4 py-2">
+        <div class="flex items-center space-x-10 justify-between">
+            {% if not textbook_info.status.collected and not textbook_info.status.returned %}
+                <span class="text-rose-500 font-semibold">Not Collected</span>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} hidden class="form-checkbox h-4 w-4 text-indigo-600">
+                    <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} hidden class="form-checkbox h-4 w-4 text-green-600">
+                    <button type="submit" name="statusform" onclick="checkCheckbox('collected_{{ textbook_info.textbook.id }}', 'returned_{{ textbook_info.textbook.id }}')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded">Make it collected</button>
+                </div>
+            {% elif textbook_info.status.collected %}
+                <span class="text-green-500 font-semibold">Collected</span>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="returned_{{ textbook_info.textbook.id }}" name="returned" {% if textbook_info.status.returned %} checked {% endif %} hidden class="form-checkbox h-4 w-4 text-indigo-600">
+                    <input type="checkbox" id="collected_{{ textbook_info.textbook.id }}" name="collected" {% if textbook_info.status.collected %} checked {% endif %} hidden class="form-checkbox h-4 w-4 text-green-600">
+                    <button type="submit" name="statusform" onclick="checkCheckbox('returned_{{ textbook_info.textbook.id }}', 'collected_{{ textbook_info.textbook.id }}')" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2 px-4 rounded">Make it returned</button>
+                </div>
+            {% elif textbook_info.status.returned %}
+                <div class="flex items-center space-x-2">
+                    <span class="text-sky-500 font-semibold">Returned</span>
+                </div>
+            {% endif %}
+        </div>
+    </td>
+    
+    <script>
+        function checkCheckbox(checkboxId, otherCheckboxId) {
+            document.getElementById(checkboxId).checked = true;
+            document.getElementById(otherCheckboxId).checked = false;
+        }
+    </script>    
+</form>
+
+    

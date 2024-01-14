@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib import admin
-from .models import User, ClassName, Textbook, Student, TextbookStatus
+from .models import User, ClassName, Textbook, Student, TextbookStatus, update_available_quantity
 from django.contrib.auth.admin import UserAdmin
+from django.db import transaction
 
 class UserAdminConfig(UserAdmin):
     fieldsets = (
@@ -71,6 +72,9 @@ class StudentConfig(admin.ModelAdmin):
 
     search_fields = ['username__username', 'username__fullname', 'student_id', 'classname__classname', 'section']
     list_filter = ['classname', 'section']
+
+    # Add the following line to enable checkbox option for textbooks
+    filter_horizontal = ('textbooks',)
     
     # Actions to update students' class to different choices
     def update_to_form1_class(self, request, queryset):
@@ -110,8 +114,44 @@ class StudentConfig(admin.ModelAdmin):
 class TextbookStatusConfig(admin.ModelAdmin):
     model = TextbookStatus
     list_display = ['student', 'textbook', 'collected', 'returned']
-    search_fields = ['student__username__username', 'textbook__book_title']
-    list_filter = ['textbook__classname', 'collected', 'returned']
+    search_fields = ['student__student_id', 'student__username__username', 'textbook__book_title']
+    list_filter = ['student__classname', 'collected', 'returned']
+
+    actions = ['mark_as_collected', 'mark_as_returned', 'uncheck_collected_returned']
+
+    @transaction.atomic
+    def mark_as_collected(self, request, queryset):
+        queryset.update(collected=True, returned=False)
+        self.update_available_quantity(queryset)
+
+    mark_as_collected.short_description = "Mark selected as collected"
+
+    @transaction.atomic
+    def mark_as_returned(self, request, queryset):
+        queryset.update(collected=False, returned=True)
+        self.update_available_quantity(queryset)
+
+    mark_as_returned.short_description = "Mark selected as returned"
+
+    @transaction.atomic
+    def uncheck_collected_returned(self, request, queryset):
+        queryset.update(collected=False, returned=False)
+        self.update_available_quantity(queryset)
+
+    uncheck_collected_returned.short_description = "Uncheck both collected and returned"
+
+    def update_available_quantity(self, queryset):
+        for instance in queryset:
+            update_available_quantity(sender=TextbookStatus, instance=instance)
+
+    def get_search_results(self, request, queryset, search_term):
+        queryset, use_distinct = super().get_search_results(request, queryset, search_term)
+
+        # Filter textbooks based on the classes assigned to students
+        student_classes = queryset.values_list('student__classname', flat=True).distinct()
+        queryset = queryset.filter(textbook__classname__in=student_classes)
+
+        return queryset, use_distinct
 
 # Change the title of the Django admin site
 admin.site.site_header = 'SMK ORKID DESA Admin Panel'

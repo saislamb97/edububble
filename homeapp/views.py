@@ -1,3 +1,4 @@
+from io import BytesIO
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import login,logout
@@ -5,9 +6,14 @@ from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, TextbookStatusForm
 from .decorators import student_required, staff_required
 from django.contrib import messages
-from .models import ClassName, TextbookStatus, Student, Textbook, update_available_quantity
+from .models import ClassName, TextbookStatus, Student, Textbook, update_available_quantity, User
 from django.db.models import Count
 import plotly.express as px
+from django.template.loader import get_template
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
 
 
 # User Index Views
@@ -80,6 +86,7 @@ def StudentIndexView(request):
     user = request.user
     classes = ClassName.objects.all()
     student = None
+    selected_class = None
 
     chart_data_for_classes = []
     for class_obj in classes:
@@ -109,9 +116,9 @@ def StudentIndexView(request):
             if textbook in textbooks_for_class:  # Check if the textbook belongs to the selected class
                 class_name = textbook.classname.classname
                 textbook_status = TextbookStatus.objects.filter(student=student_profile, textbook=textbook).first()
-                status = 'Not Specified'  # Default status if no textbook status found
+                status = 'Not Collected'  # Default status if no textbook status found
                 if textbook_status:
-                    status = 'Collected' if textbook_status.collected else ('Returned' if textbook_status.returned else 'Not Specified')
+                    status = 'Collected' if textbook_status.collected else ('Returned' if textbook_status.returned else 'Not Collected')
 
                 textbooks_with_status.append({
                     'textbook': textbook,
@@ -121,6 +128,7 @@ def StudentIndexView(request):
 
     context = {
         'textbooks_with_status': textbooks_with_status,
+        'selected_class': selected_class,
         'user': user,
         'all_classes': classes,
         'student': student,
@@ -152,40 +160,59 @@ def generate_textbook_status_chart(class_name, user):
 
     collected_count = TextbookStatus.objects.filter(textbook__in=class_textbooks, student__username=user, collected=True).count()
     returned_count = TextbookStatus.objects.filter(textbook__in=class_textbooks, student__username=user, returned=True).count()
-    not_specified_count = class_textbooks.count() - (collected_count + returned_count)
+    not_collected_count = class_textbooks.count() - (collected_count + returned_count)
 
     counts = {
+        'class_name': class_name.classname,
         'collected': collected_count,
         'returned': returned_count,
-        'not_specified': not_specified_count
+        'not_collected': not_collected_count
     }
 
     fig = px.pie(values=list(counts.values()), names=list(counts.keys()), title=class_name.classname)
     fig.update_traces(textinfo='percent+label', hole=0.4)
 
     chart_div = fig.to_html(full_html=False, include_plotlyjs='cdn')
+    
     return {
         'chart_div': chart_div,
         'counts': counts
     }
 
+
 def generate_textbook_status_chart_for_class(class_name):
     # Retrieve all students in the specified class
     students_in_class = Student.objects.filter(classname=class_name)
 
-    # Retrieve textbooks for all students in the class
-    textbooks_for_class_students = Textbook.objects.filter(student__in=students_in_class).distinct()
+    # Initialize counts
+    collected_count = 0
+    returned_count = 0
+    not_collected_count = 0
 
-    # Calculate counts for textbook statuses
-    collected_count = TextbookStatus.objects.filter(textbook__in=textbooks_for_class_students, collected=True).count()
-    returned_count = TextbookStatus.objects.filter(textbook__in=textbooks_for_class_students, returned=True).count()
-    not_specified_count = textbooks_for_class_students.count() - (collected_count + returned_count)
+    # Loop through each student
+    for student in students_in_class:
+        # Retrieve textbooks for the current student assigned to the specified class
+        textbooks_for_student_in_class = student.textbooks.filter(classname=class_name)
+
+        # Check the status of each textbook for the current student
+        for textbook in textbooks_for_student_in_class:
+            # Try to get the status for the current student and textbook
+            textbook_status = TextbookStatus.objects.get(student=student, textbook=textbook)
+
+            # Update counts based on the status
+            if textbook_status.collected:
+                collected_count += 1
+            elif textbook_status.returned:
+                returned_count += 1
+            else:
+                not_collected_count += 1
 
     # Prepare counts dictionary
     counts = {
+        'class_name': class_name.classname,
         'collected': collected_count,
         'returned': returned_count,
-        'not_specified': not_specified_count
+        'not_collected': not_collected_count
     }
 
     # Create pie chart
@@ -286,6 +313,78 @@ def update_textbook_status(request):
     update_available_quantity(sender=TextbookStatus, instance=textbook_status)
 
     messages.success(request, 'Textbook status updated.')
+
+def generate_student_report(student, textbooks_status):
+    # Function to generate the content of the PDF report
+    template = get_template('student_index.html')
+    context = {'student': student, 'textbooks_status': textbooks_status}
+    content = template.render(context)
+    return content
+
+def student_report_pdf(request, student_id, class_name):
+    # Get the student object
+    student = get_object_or_404(Student, student_id=student_id)
+
+    # Fetch textbooks and their status for the specific class
+    textbooks_status = TextbookStatus.objects.filter(student=student, textbook__classname__classname=class_name)
+
+    # Create the PDF response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{student.username.fullname}_report.pdf"'
+
+    # Create PDF document using reportlab
+    buffer = BytesIO()
+    pdf = SimpleDocTemplate(buffer, pagesize=letter)
+    elements = []
+
+   # Header
+    header = student.username.fullname
+    header_style = getSampleStyleSheet()['Heading1']
+    header_style.alignment = 1  # 0 for left, 1 for center, 2 for right
+
+    elements.append(Paragraph(header, header_style))
+
+    # Student Information Table
+    student_info_data = [
+        ["Full Name", student.username.fullname],
+        ["Student ID/IC", student.student_id],
+        ["Class Name", student.classname.classname],
+        ["Section", student.section],
+    ]
+    student_info_table = Table(student_info_data, colWidths=[120, 200])
+    student_info_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+    ]))
+    elements.append(student_info_table)
+
+    # Textbooks Table
+    textbooks_data = [["Title", "Collected", "Returned"]]
+    textbooks_data += [[
+        ts.textbook.book_title,
+        "Yes" if ts.collected else "No",
+        "Yes" if ts.returned else "No"
+    ] for ts in textbooks_status]
+
+    textbooks_table = Table(textbooks_data, colWidths=[300, 80, 80])
+    textbooks_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('NOBREAK', (0, 0), (-1, -1), 1),  # Avoid page break within the table
+    ]))
+    elements.append(textbooks_table)
+
+    # Build the PDF
+    pdf.build(elements)
+    pdf_content = buffer.getvalue()
+    buffer.close()
+
+    response.write(pdf_content)
+    return response
 
 def LoginView(request):
     if request.user.is_authenticated:
