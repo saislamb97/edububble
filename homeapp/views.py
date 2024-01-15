@@ -360,11 +360,10 @@ def student_report_pdf(request, student_id, class_name):
     elements.append(student_info_table)
 
     # Textbooks Table
-    textbooks_data = [["Title", "Collected", "Returned"]]
+    textbooks_data = [["Title", "Status"]]
     textbooks_data += [[
         ts.textbook.book_title,
-        "Yes" if ts.collected else "No",
-        "Yes" if ts.returned else "No"
+        "Collected" if ts.collected else "Returned" if ts.returned else "Not Collected"
     ] for ts in textbooks_status]
 
     textbooks_table = Table(textbooks_data, colWidths=[300, 80, 80])
