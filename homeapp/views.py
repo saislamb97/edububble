@@ -314,12 +314,12 @@ def update_textbook_status(request):
 
     messages.success(request, 'Textbook status updated.')
 
-def generate_student_report(student, textbooks_status):
-    # Function to generate the content of the PDF report
-    template = get_template('student_index.html')
-    context = {'student': student, 'textbooks_status': textbooks_status}
-    content = template.render(context)
-    return content
+# def generate_student_report(student, textbooks_status):
+#     # Function to generate the content of the PDF report
+#     template = get_template('student_index.html')
+#     context = {'student': student, 'textbooks_status': textbooks_status}
+#     content = template.render(context)
+#     return content
 
 def student_report_pdf(request, student_id, class_name):
     # Get the student object
@@ -338,7 +338,7 @@ def student_report_pdf(request, student_id, class_name):
     elements = []
 
    # Header
-    header = student.username.fullname
+    header = "SMK ORKID DESA"
     header_style = getSampleStyleSheet()['Heading1']
     header_style.alignment = 1  # 0 for left, 1 for center, 2 for right
 
