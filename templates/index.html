@@ -31,10 +31,10 @@
                 <tbody class="text-gray-800">
                     {% if request.user.is_staff%}
                         <tr class="transition-colors">
-                            <td class="px-6 py-4">Full Name: <br> <b>{{ user.fullname }}<b></td>
-                            <td class="px-6 py-4">Username: <br> <b>{{ user.username }}<b></td>
-                            <td class="px-6 py-4">Email: <br> <b>{{ user.email }}<b></td>
-                            <td class="px-6 py-4">Role: <br> <b>Staff<b></td>
+                            <td class="px-6 py-3">Full Name: <br> <b>{{ user.fullname }}<b></td>
+                            <td class="px-6 py-3">Username: <br> <b>{{ user.username }}<b></td>
+                            <td class="px-6 py-3">Email: <br> <b>{{ user.email }}<b></td>
+                            <td class="px-6 py-3">Role: <br> <b>Staff<b></td>
                         </tr>
                     {% endif %}
                 </tbody>

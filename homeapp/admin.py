@@ -76,40 +76,32 @@ class StudentConfig(admin.ModelAdmin):
     # Add the following line to enable checkbox option for textbooks
     filter_horizontal = ('textbooks',)
     
-    # Actions to update students' class to different choices
-    def update_to_form1_class(self, request, queryset):
-        self.update_class(request, queryset, 'Form1')
+    # Generic method to update class or section
+    def update_field(self, request, queryset, field_name, field_value):
+        if field_name == 'classname':  # Check if the field is 'classname'
+            selected_class = ClassName.objects.get(classname=field_value)
+            queryset.update(**{field_name: selected_class})
+        elif field_name == 'section':  # Check if the field is 'section'
+            queryset.update(**{field_name: field_value})
+        else:
+            queryset.update(**{field_name: field_value})
 
-    def update_to_form2_class(self, request, queryset):
-        self.update_class(request, queryset, 'Form2')
+    # Actions to update students' class
+    for class_name in ['Form1', 'Form2', 'Form3', 'Form4', 'Form5', 'Graduate']:
+        method_name = f'update_to_{class_name.lower()}_class'
+        short_description = f"Update selected students to {class_name} class"
+        locals()[method_name] = (lambda cn=class_name: lambda self, r, q: self.update_field(r, q, 'classname', cn))(class_name)
+        setattr(locals()[method_name], 'short_description', short_description)
 
-    def update_to_form3_class(self, request, queryset):
-        self.update_class(request, queryset, 'Form3')
+    # Actions to update students' section
+    for section_value in ['EXA', 'PETA', 'TERA', 'GIGA', 'MEGA']:
+        method_name = f'update_to_{section_value.lower()}_section'
+        short_description = f"Update selected students to {section_value} section"
+        locals()[method_name] = (lambda sv=section_value: lambda self, r, q: self.update_field(r, q, 'section', sv))(section_value)
+        setattr(locals()[method_name], 'short_description', short_description)
 
-    def update_to_form4_class(self, request, queryset):
-        self.update_class(request, queryset, 'Form4')
-
-    def update_to_form5_class(self, request, queryset):
-        self.update_class(request, queryset, 'Form5')
-
-    def update_to_graduate_class(self, request, queryset):
-        self.update_class(request, queryset, 'Graduate')
-
-    def update_class(self, request, queryset, class_name):
-        selected_class = ClassName.objects.get(classname=class_name)
-        queryset.update(classname=selected_class)
-
-    update_to_form1_class.short_description = "Update selected students to Form1 class"
-    update_to_form2_class.short_description = "Update selected students to Form2 class"
-    update_to_form3_class.short_description = "Update selected students to Form3 class"
-    update_to_form4_class.short_description = "Update selected students to Form4 class"
-    update_to_form5_class.short_description = "Update selected students to Form5 class"
-    update_to_graduate_class.short_description = "Update selected students to Graduate class"
-
-    actions = [
-        'update_to_form1_class', 'update_to_form2_class', 'update_to_form3_class',
-        'update_to_form4_class', 'update_to_form5_class', 'update_to_graduate_class'
-    ]
+    actions = [f'update_to_{class_name.lower()}_class' for class_name in ['Form1', 'Form2', 'Form3', 'Form4', 'Form5', 'Graduate']] + \
+              [f'update_to_{section_value.lower()}_section' for section_value in ['EXA', 'PETA', 'TERA', 'GIGA', 'MEGA']]
 
 class TextbookStatusConfig(admin.ModelAdmin):
     model = TextbookStatus
